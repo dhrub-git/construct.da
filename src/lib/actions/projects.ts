@@ -1,11 +1,217 @@
 "use server";
 import { FilesStrict, GenerateProjectReport, ProjectSpecs, ProjectStage, ProjectStatus, ProjectStrict, ProjectWithFiles } from "@models/data";
 import prisma from "../prisma";
+import { buildRossStreetMasterViewProjectMetadata, buildRossStreetMasterViewProjectSpecs, ROSS_STREET_MASTER_VIEW_APPLICATION } from "@/lib/masterview/north-sydney";
 import { addressToCoordinatesGoogle } from "../geoEncoding";
 import { Prisma } from "@prisma/client";
 import { ExtractedFacts, RulesPack } from "../agent/types";
 import { buildFixtureSpatialConstraints, SpatialConstraintSource, SPATIAL_FIXTURE_RETRIEVED_AT } from "../spatial";
 
+
+
+export async function createRossStreetMasterViewDemoProject(userId: string): Promise<ProjectStrict> {
+    try {
+        const projectSpecs = buildRossStreetMasterViewProjectSpecs(userId);
+        const metadata = buildRossStreetMasterViewProjectMetadata();
+        const application = ROSS_STREET_MASTER_VIEW_APPLICATION;
+
+        const createdProject = await prisma.$transaction(async (tx) => {
+            const project = await tx.project.create({
+                data: {
+                    name: projectSpecs.name,
+                    description: projectSpecs.description,
+                    address: projectSpecs.address,
+                    type: projectSpecs.type,
+                    council: projectSpecs.council,
+                    userId,
+                    metadata: metadata as unknown as Prisma.InputJsonObject,
+                    Files: {
+                        createMany: {
+                            data: projectSpecs.files.map((file) => ({
+                                name: file.filename,
+                                url: file.url,
+                                status: "PROCESSED",
+                                metadata: {
+                                    mimeType: file.mimetype,
+                                    size: file.size,
+                                    fileType: file.fileType,
+                                    source: "north-sydney-masterview",
+                                    applicationNumber: application.applicationNumber,
+                                    stage: "PROCESSED",
+                                    completedAt: metadata.processingCompletedAt,
+                                },
+                                userId: file.userId,
+                            })),
+                        },
+                    },
+                },
+            });
+
+            const checks = [
+                {
+                    key: "masterview_document_pack",
+                    category: "COMPLETENESS",
+                    passed: true,
+                    severity: "LOW",
+                    message: "MasterView document pack imported: BASIX, heritage statement, site plans, SEE, survey, stormwater, waste, shadow diagrams, and notification plans.",
+                    expected: "Lodged DA document set",
+                    actual: application.documents.map((document) => document.fileType),
+                    evidence: ["North Sydney MasterView documents table"],
+                },
+                {
+                    key: "ross_street_controls_extracted",
+                    category: "NUMERIC_THRESHOLD",
+                    passed: true,
+                    severity: "LOW",
+                    message: "R2 zoning, 8.5 m height control, approximately 234-241.4 sqm site area, and 172 sqm proposed GFA are captured for review.",
+                    expected: { zoning: application.zoning, heightControl: application.heightControl },
+                    actual: { siteArea: application.siteAreaRange, proposedGfa: application.proposedGfa },
+                    evidence: ["SEE", "Site plans", "Survey plan"],
+                },
+                {
+                    key: "clause46_not_triggered",
+                    category: "PATHWAY_ELIGIBILITY",
+                    passed: true,
+                    severity: "LOW",
+                    message: "No cl. 4.6 variation is triggered by the current control-case facts because the SEE states height and controls are compliant.",
+                    expected: "No development-standard breach identified",
+                    actual: "SEE marks LEP height compliance as YES",
+                    evidence: ["SEE North Sydney LEP 2013 assessment", "Site plans height-control notation"],
+                },
+                {
+                    key: "heritage_adjacency_review",
+                    category: "RISK_HEURISTIC",
+                    passed: false,
+                    severity: "MEDIUM",
+                    message: "Heritage-adjacent context should remain in planner review: the site is not listed but is near 17 and 21 Ross Street heritage items and Bay Road Conservation Area, with Heritage Officer referral recorded.",
+                    expected: "Heritage referral risk acknowledged",
+                    actual: "Referral to Heritage Officer plus nearby heritage resources",
+                    evidence: ["Heritage Statement", "MasterView tracking table"],
+                },
+            ];
+
+            const findings = [
+                {
+                    key: "heritage_adjacency_review",
+                    severity: "MEDIUM",
+                    title: "Heritage-adjacent referral to review",
+                    detail: "The subject site is not a heritage item and is not within a conservation area, but the lodged material identifies nearby heritage items at 17 and 21 Ross Street and Bay Road Conservation Area. MasterView tracking records referral to the Heritage Officer.",
+                    evidence: ["Heritage Statement", "MasterView tracking table"],
+                    recommendation: "Keep the Heritage Statement and design response visible in the advisory report; do not treat the site as unconstrained merely because it is not listed.",
+                },
+            ];
+
+            const summary = {
+                executiveSummary: "DA172/2026 at 15A Ross Street is loaded as a live North Sydney MasterView control case. The app can show the real document pack, extract key planning controls, flag heritage-adjacent review, and avoid hallucinating a cl. 4.6 variation where the lodged SEE says controls are satisfied.",
+                likelyRisks: ["Heritage-adjacent referral review"],
+                missingDocs: [],
+                recommendedNextSteps: [
+                    "Review the Heritage Officer referral once Council publishes assessment comments.",
+                    "Use the site plans and SEE as the source of truth for the no-cl. 4.6 control-case demo.",
+                    "Switch to a prepared breach fixture only for the separate cl. 4.6 drafting wow moment.",
+                ],
+                confidenceNote: "High confidence for application metadata and document-list facts from MasterView; advisory only until Council assessment is complete.",
+                summary: "Live MasterView DA imported and ready as a no-hallucination control case.",
+            };
+
+            const facts = {
+                siteArea: 241.4,
+                frontage: 6.185,
+                setbacks: {},
+                height: null,
+                floorArea: 172,
+                fsr: null,
+                overlays: ["heritage-adjacent", "heritage-officer-referral"],
+                parking: null,
+                bedrooms: null,
+                missingConsultantDocs: [],
+                detectedReports: application.documents.map((document) => document.fileType),
+                confidence: 0.9,
+                notes: "Ross Street MasterView control-case facts seeded from lodged SEE, site plans, survey, and heritage statement.",
+            };
+
+            const rules = {
+                query: "North Sydney R2 semi-detached dwelling alterations DA172/2026",
+                appliedFilters: {
+                    state: "NSW",
+                    council: application.council,
+                    projectType: projectSpecs.type,
+                    zoning: [application.zoning],
+                },
+                rules: [],
+            };
+
+            await tx.projectReport.create({
+                data: {
+                    projectId: project.id,
+                    status: "COMPLETED",
+                    score: 88,
+                    summary: summary.summary,
+                    executiveSummary: summary.executiveSummary,
+                    findingsJson: findings as Prisma.InputJsonValue,
+                    factsJson: facts as Prisma.InputJsonValue,
+                    rulesJson: rules as Prisma.InputJsonValue,
+                    rawOutputJson: {
+                        facts,
+                        rules,
+                        checks: {
+                            checks,
+                            findings,
+                            score: 88,
+                            riskLevel: "LOW",
+                            missingDocuments: [],
+                            likelyPathway: "Standard DA pathway with heritage-adjacent planner review",
+                            blockingIssues: [],
+                        },
+                        summary,
+                        issues: [],
+                    } as Prisma.InputJsonObject,
+                    content: {
+                        summary,
+                        checks: {
+                            checks,
+                            findings,
+                            score: 88,
+                            riskLevel: "LOW",
+                            missingDocuments: [],
+                            likelyPathway: "Standard DA pathway with heritage-adjacent planner review",
+                            blockingIssues: [],
+                        },
+                    } as Prisma.InputJsonObject,
+                    version: 1,
+                    findings: {
+                        create: findings.map((finding) => ({
+                            ...finding,
+                            evidence: finding.evidence as Prisma.InputJsonValue,
+                        })),
+                    },
+                    checkResults: {
+                        create: checks.map((check) => ({
+                            key: check.key,
+                            category: check.category,
+                            passed: check.passed,
+                            severity: check.severity,
+                            message: check.message,
+                            expected: check.expected as Prisma.InputJsonValue,
+                            actual: check.actual as Prisma.InputJsonValue,
+                            evidence: check.evidence as Prisma.InputJsonValue,
+                        })),
+                    },
+                },
+            });
+
+            return project;
+        });
+
+        return {
+            ...createdProject,
+            metadata: createdProject.metadata as unknown as Pick<ProjectStrict, "metadata">["metadata"],
+        };
+    } catch (error) {
+        console.error("Error creating Ross Street MasterView demo project:", error);
+        throw error;
+    }
+}
 
 export async function getProjectsForUser(userId: string): Promise<ProjectStrict[]> {
     try {

@@ -78,6 +78,9 @@ export type ProjectWorkspaceState = {
   address: string;
   council: string;
   location: { lat: number; lng: number } | null;
+  masterView: ProjectMetadata["masterView"] | null;
+  planningFacts: ProjectMetadata["planningFacts"] | null;
+  clause46: ProjectMetadata["clause46"] | null;
 };
 
 function asDate(value: string | Date | null | undefined): Date | null {
@@ -369,6 +372,9 @@ export function deriveProjectWorkspaceState(
     address: project.address,
     council: project.council,
     location,
+    masterView: project.metadata.masterView ?? null,
+    planningFacts: project.metadata.planningFacts ?? null,
+    clause46: project.metadata.clause46 ?? null,
   };
 }
 

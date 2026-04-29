@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CopyIcon, DownloadIcon, FileTextIcon, RefreshCwIcon } from "lucide-react";
+import { CheckCircle2Icon, CopyIcon, DownloadIcon, FileTextIcon, RefreshCwIcon } from "lucide-react";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -10,14 +10,47 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { Streamdown } from "@/components/shared/Streamdown";
 import { Clause46DraftPanel } from "@/components/projects/clause46-draft-panel";
+import { PdfRedlineViewer } from "@/components/projects/pdf-redline-viewer";
 import { ProjectWorkspaceState } from "@/lib/project-workspace";
+import { getRossStreetControlCasePdfViolations } from "@/lib/pdf/violation-schema";
 
 type ProjectReportTabProps = {
   workspace: ProjectWorkspaceState;
 };
 
+
+function Clause46NotTriggeredPanel({ clause46 }: { clause46: NonNullable<ProjectWorkspaceState["clause46"]> }) {
+  return (
+    <Card className="border-emerald-500/20 bg-emerald-500/5">
+      <CardHeader className="border-b border-emerald-500/20 pb-4">
+        <CardTitle className="flex items-center gap-2 text-emerald-100">
+          <CheckCircle2Icon data-icon="inline-start" />
+          cl. 4.6 not triggered
+        </CardTitle>
+        <CardDescription>
+          This project is configured as a no-hallucination control case. The variation drafter is hidden unless a development-standard breach is detected.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="pt-4">
+        <p className="text-sm leading-6 text-muted-foreground">{clause46.reason}</p>
+        {clause46.source ? (
+          <Badge variant="outline" className="mt-3">Source: {clause46.source}</Badge>
+        ) : null}
+      </CardContent>
+    </Card>
+  );
+}
+
 export function ProjectReportTab({ workspace }: ProjectReportTabProps) {
   const [copied, setCopied] = useState(false);
+  const primaryPlanFile = workspace.fileRows.find((file) => file.type === "SITE_PLAN")
+    ?? workspace.fileRows.find((file) => file.type === "NOTIFICATION_PLANS")
+    ?? workspace.fileRows[0]
+    ?? null;
+  const isRossStreetControlCase = workspace.masterView?.applicationNumber === "10.2026.00000172.001";
+  const pdfViolations = isRossStreetControlCase
+    ? getRossStreetControlCasePdfViolations(primaryPlanFile?.id)
+    : undefined;
 
   const handleCopy = async () => {
     if (!workspace.reportMarkdown) {
@@ -104,7 +137,18 @@ export function ProjectReportTab({ workspace }: ProjectReportTabProps) {
         </CardContent>
       </Card>
 
-      <Clause46DraftPanel />
+      <PdfRedlineViewer
+        fileId={primaryPlanFile?.id}
+        fileName={primaryPlanFile?.name}
+        fileUrl={primaryPlanFile?.url}
+        violations={pdfViolations}
+      />
+
+      {workspace.clause46?.triggered === false ? (
+        <Clause46NotTriggeredPanel clause46={workspace.clause46} />
+      ) : (
+        <Clause46DraftPanel input={workspace.clause46?.input} />
+      )}
 
       <Separator />
 

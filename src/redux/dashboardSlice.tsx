@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { RootState } from "./store";
 import { ProjectSpecs, ProjectStrict } from "@models/data";
-import { getProjectsForUser, createProject } from "@actions/projects";
+import { getProjectsForUser, createProject, createRossStreetMasterViewDemoProject } from "@actions/projects";
 
 interface DashboardState {
   projects: ProjectStrict[];
@@ -43,6 +43,19 @@ export const createProjectThunk = createAsyncThunk<
   }
 });
 
+export const createRossStreetMasterViewProjectThunk = createAsyncThunk<
+  ProjectStrict,
+  { userId: string },
+  { state: RootState }
+>("dashboard/createRossStreetMasterViewProject", async ({ userId }) => {
+  try {
+    return await createRossStreetMasterViewDemoProject(userId);
+  } catch (error) {
+    console.error("Error creating Ross Street MasterView project:", error);
+    throw error;
+  }
+});
+
 export const dashboardSlice = createSlice({
   name: "dashboard",
   initialState,
@@ -68,6 +81,15 @@ export const dashboardSlice = createSlice({
       })
       .addCase(createProjectThunk.rejected, (state, action) => {
         state.error = action.error.message || "Failed to create project";
+      })
+      .addCase(createRossStreetMasterViewProjectThunk.pending, (state) => {
+        state.error = null;
+      })
+      .addCase(createRossStreetMasterViewProjectThunk.fulfilled, (state, action) => {
+        state.projects.push(action.payload);
+      })
+      .addCase(createRossStreetMasterViewProjectThunk.rejected, (state, action) => {
+        state.error = action.error.message || "Failed to create Ross Street MasterView project";
       });
   },
   reducers: {

@@ -45,7 +45,8 @@ export enum ProjectStage {
 
 export interface ProjectMetadata {
     geoEncoding: Coordinates;
-    runId?: string;
+    runId?: string | null;
+    state?: string | null;
     stage: ProjectStage;
     processingStatus?: ProjectStatus;
     processingStartedAt?: string;
@@ -56,6 +57,40 @@ export interface ProjectMetadata {
     spatialConstraints?: SpatialConstraint[];
     spatialConstraintsLoadedAt?: string;
     spatialConstraintsSource?: SpatialConstraintSource;
+    masterView?: {
+        applicationNumber: string;
+        councilReference: string;
+        sourceUrl: string;
+        status: string;
+        determinationType: string;
+        submittedDate: string;
+        notificationStart: string;
+        notificationEnd: string;
+        estimatedCost: string;
+        applicant: string;
+        officer: string;
+        documents: Array<{
+            id: string;
+            description: string;
+            documentDate: string;
+            fileType: string;
+            url: string;
+        }>;
+    };
+    planningFacts?: {
+        zoning?: string;
+        siteArea?: string;
+        proposedGfa?: string;
+        heightControl?: string;
+        heritageSummary?: string;
+        controlsComplianceSummary?: string;
+    };
+    clause46?: {
+        triggered: boolean;
+        reason: string;
+        source?: string;
+        input?: import("@/lib/drafter/clause46").Clause46DraftInput;
+    };
 }
 
 export interface ProjectSpecs {

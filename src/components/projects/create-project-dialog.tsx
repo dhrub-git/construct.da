@@ -5,7 +5,7 @@ import { PutBlobResult } from "@vercel/blob";
 import { useMemo, useState } from "react";
 import { ArrowLeftIcon, ArrowRightIcon, UploadIcon } from "lucide-react";
 
-import { createProjectThunk } from "@/redux/dashboardSlice";
+import { createProjectThunk, createRossStreetMasterViewProjectThunk } from "@/redux/dashboardSlice";
 import { useAppDispatch } from "@/redux/useDispatch";
 import { Button } from "@/components/ui/button";
 import {
@@ -98,6 +98,7 @@ export function CreateProjectDialog({
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
+  const [creatingMasterViewDemo, setCreatingMasterViewDemo] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<WizardData>(defaultData);
   const [uploadedFiles, setUploadedFiles] = useState<DocumentUploadDraft[]>([]);
@@ -117,11 +118,34 @@ export function CreateProjectDialog({
     setUploadedFiles([]);
     setError(null);
     setSubmitting(false);
+    setCreatingMasterViewDemo(false);
   };
 
   const closeDialog = () => {
     setOpen(false);
     resetDialog();
+  };
+
+  const handleCreateMasterViewDemo = async () => {
+    setCreatingMasterViewDemo(true);
+    setError(null);
+
+    try {
+      const createdProject = await dispatch(
+        createRossStreetMasterViewProjectThunk({ userId }),
+      ).unwrap();
+
+      closeDialog();
+      onCreated(createdProject.id);
+    } catch (submitError) {
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "Unable to create the North Sydney MasterView demo project.",
+      );
+    } finally {
+      setCreatingMasterViewDemo(false);
+    }
   };
 
   const handleSubmit = async () => {
@@ -268,6 +292,27 @@ export function CreateProjectDialog({
           })}
         </ol>
 
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-foreground">North Sydney MasterView demo DA</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Instantly create DA172/2026 for 15A Ross Street with the real document checklist,
+                R2 / 8.5 m control facts, heritage-adjacent referral, and no cl. 4.6 trigger.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleCreateMasterViewDemo}
+              disabled={submitting || creatingMasterViewDemo}
+              className="shrink-0"
+            >
+              {creatingMasterViewDemo ? "Creating…" : "Load MasterView DA"}
+            </Button>
+          </div>
+        </div>
+
         <FieldGroup>
           {step === 0 ? (
             <>
@@ -408,7 +453,7 @@ export function CreateProjectDialog({
               <RequiredDocumentsGrid
                 projectType={data.projectType}
                 uploads={uploadedFiles}
-                disabled={submitting}
+                disabled={submitting || creatingMasterViewDemo}
                 onUploaded={handleDocumentUpload}
                 onRemoveUpload={handleRemoveUpload}
               />
