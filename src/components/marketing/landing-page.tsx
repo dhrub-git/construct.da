@@ -12,15 +12,22 @@ import {
 import { cn } from "@/lib/utils";
 
 export function LandingPage() {
+  const shellClassName = "mx-auto w-full max-w-7xl px-6 lg:px-10";
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b bg-background/88 backdrop-blur-xl supports-backdrop-filter:bg-background/78">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 lg:px-10">
-          <div className="flex flex-col gap-1">
+        <div
+          className={cn(
+            shellClassName,
+            "flex min-h-20 items-center justify-between gap-6 py-4",
+          )}
+        >
+          <div className="flex min-w-0 max-w-[44rem] flex-col gap-1">
             <span className="text-[22px] font-bold leading-none tracking-[-0.04em] text-primary">
               construct.da
             </span>
-            <span className="text-sm text-muted-foreground">
+            <span className="text-sm leading-5 text-muted-foreground">
               Advisory pre-lodgement screening for residential approvals
             </span>
           </div>
@@ -34,7 +41,7 @@ export function LandingPage() {
       </header>
 
       <main>
-        <section className="relative isolate min-h-[calc(100svh-6rem)] overflow-hidden border-b px-6 py-12 lg:px-10 lg:py-16">
+        <section className="relative isolate min-h-[calc(100svh-6rem)] overflow-hidden border-b py-12 lg:py-16">
           <Image
             src="/da-approval-hero-v2.png"
             alt=""
@@ -46,7 +53,12 @@ export function LandingPage() {
           <div className="absolute inset-0 -z-10 bg-linear-to-r from-background via-background/92 to-background/18" />
           <div className="absolute inset-0 -z-10 bg-linear-to-b from-background/82 via-transparent to-background/72" />
 
-          <div className="mx-auto flex min-h-[calc(100svh-14rem)] w-full max-w-7xl items-center">
+          <div
+            className={cn(
+              shellClassName,
+              "flex min-h-[calc(100svh-14rem)] items-center",
+            )}
+          >
             <div className="flex max-w-3xl flex-col gap-7">
               <div className="flex flex-wrap gap-2">
                 <Badge variant="outline">Advisory only</Badge>
@@ -110,8 +122,8 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="how-it-works" className="px-6 pb-20 lg:px-10 lg:pb-24">
-          <div className="mx-auto flex w-full max-w-7xl flex-col gap-8">
+        <section id="how-it-works" className="pb-20 lg:pb-24">
+          <div className={cn(shellClassName, "flex flex-col gap-8")}>
             <div className="max-w-3xl space-y-3">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
                 How the advisory workflow starts
