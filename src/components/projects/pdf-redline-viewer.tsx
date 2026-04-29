@@ -135,7 +135,7 @@ export function PdfRedlineViewer({
         <aside className="rounded-[24px] border border-border bg-secondary/30 p-4">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-sm font-semibold text-white">Issue rail</p>
+              <p className="text-sm font-semibold text-foreground">Issue rail</p>
               <p className="text-xs text-muted-foreground">Fixture-backed findings for legal review.</p>
             </div>
             <Badge variant="outline">{fileName ?? "site-plan.pdf"}</Badge>
@@ -161,7 +161,7 @@ export function PdfRedlineViewer({
                         <span className="text-xs text-muted-foreground">{violation.rule}</span>
                       </div>
                       <div>
-                        <p className="font-medium text-white">{violation.title}</p>
+                        <p className="font-medium text-foreground">{violation.title}</p>
                         <p className="mt-1 text-sm leading-6 text-muted-foreground">{violation.message}</p>
                       </div>
                     </div>

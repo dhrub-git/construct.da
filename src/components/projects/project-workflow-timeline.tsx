@@ -64,7 +64,7 @@ export function ProjectWorkflowTimeline({ workspace }: ProjectWorkflowTimelinePr
                 </div>
                 <div className="min-w-0 flex-1 pb-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-medium text-white">{step.label}</p>
+                    <p className="font-medium text-foreground">{step.label}</p>
                     <Badge variant={stepTone(step.state)}>{step.state}</Badge>
                   </div>
                   {step.details ? <p className="mt-1 text-sm text-muted-foreground">{step.details}</p> : null}

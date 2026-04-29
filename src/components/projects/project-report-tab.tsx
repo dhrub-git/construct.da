@@ -23,7 +23,7 @@ function Clause46NotTriggeredPanel({ clause46 }: { clause46: NonNullable<Project
   return (
     <Card className="border-emerald-500/20 bg-emerald-500/5">
       <CardHeader className="border-b border-emerald-500/20 pb-4">
-        <CardTitle className="flex items-center gap-2 text-emerald-100">
+        <CardTitle className="flex items-center gap-2 text-emerald-700">
           <CheckCircle2Icon data-icon="inline-start" />
           cl. 4.6 not triggered
         </CardTitle>
@@ -112,15 +112,15 @@ export function ProjectReportTab({ workspace }: ProjectReportTabProps) {
           <div className="grid gap-3 sm:grid-cols-3">
             <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
               <p className="text-xs uppercase tracking-[0.08em] text-muted-foreground">Generated at</p>
-              <p className="mt-2 text-sm font-medium text-white">{workspace.reportMetadata?.generatedAt ?? "—"}</p>
+              <p className="mt-2 text-sm font-medium text-foreground">{workspace.reportMetadata?.generatedAt ?? "—"}</p>
             </div>
             <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
               <p className="text-xs uppercase tracking-[0.08em] text-muted-foreground">Source files</p>
-              <p className="mt-2 text-sm font-medium text-white">{workspace.reportMetadata?.sourceFilesCount ?? 0}</p>
+              <p className="mt-2 text-sm font-medium text-foreground">{workspace.reportMetadata?.sourceFilesCount ?? 0}</p>
             </div>
             <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
               <p className="text-xs uppercase tracking-[0.08em] text-muted-foreground">Current score</p>
-              <p className="mt-2 text-sm font-medium text-white">{workspace.latestReport ? `${workspace.latestReport.score}/100` : "—"}</p>
+              <p className="mt-2 text-sm font-medium text-foreground">{workspace.latestReport ? `${workspace.latestReport.score}/100` : "—"}</p>
             </div>
           </div>
 

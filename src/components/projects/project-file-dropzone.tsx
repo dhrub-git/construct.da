@@ -117,7 +117,7 @@ export function ProjectFileDropzone({ accept, disabled, onUploaded }: ProjectFil
       />
 
       <div className="flex flex-col gap-2 text-center md:text-left">
-        <p className="text-sm font-semibold text-white">
+        <p className="text-sm font-semibold text-foreground">
           {state === "dragging" ? "Drop to upload" : "Upload a new file"}
         </p>
         <p className="text-sm text-muted-foreground">

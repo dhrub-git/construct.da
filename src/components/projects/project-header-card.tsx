@@ -84,27 +84,27 @@ export function ProjectHeaderCard({ project, workspace, onProcess, processDisabl
             <CalendarDaysIcon data-icon="inline-start" />
             Created
           </p>
-          <p className="mt-2 text-sm font-medium text-white">{formatDate(project.createdAt)}</p>
+          <p className="mt-2 text-sm font-medium text-foreground">{formatDate(project.createdAt)}</p>
         </div>
         <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
           <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
             <Clock3Icon data-icon="inline-start" />
             Updated
           </p>
-          <p className="mt-2 text-sm font-medium text-white">{formatDate(project.updatedAt)}</p>
+          <p className="mt-2 text-sm font-medium text-foreground">{formatDate(project.updatedAt)}</p>
         </div>
         <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
           <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
             <FileTextIcon data-icon="inline-start" />
             Files
           </p>
-          <p className="mt-2 text-sm font-medium text-white">{workspace.totalFiles} documents</p>
+          <p className="mt-2 text-sm font-medium text-foreground">{workspace.totalFiles} documents</p>
         </div>
         <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
           <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">Completion</p>
           <div className="mt-3 flex items-center gap-3">
             <Progress value={workspace.completionPercent} className="flex-1" />
-            <span className="text-sm font-semibold tabular-nums text-white">{workspace.completionPercent}%</span>
+            <span className="text-sm font-semibold tabular-nums text-foreground">{workspace.completionPercent}%</span>
           </div>
         </div>
       </CardContent>

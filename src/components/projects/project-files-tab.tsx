@@ -112,7 +112,7 @@ export function ProjectFilesTab({
               <TableBody>
                 {workspace.fileRows.map((file) => (
                   <TableRow key={file.id}>
-                    <TableCell className="max-w-64 truncate font-semibold text-white">{file.name}</TableCell>
+                    <TableCell className="max-w-64 truncate font-semibold text-foreground">{file.name}</TableCell>
                     <TableCell className="text-muted-foreground">{file.type}</TableCell>
                     <TableCell className="text-muted-foreground">{formatBytes(file.size)}</TableCell>
                     <TableCell className="text-muted-foreground">{formatDate(file.uploadedAt)}</TableCell>

@@ -74,7 +74,7 @@ export function ProjectStatsCards({ workspace }: ProjectStatsCardsProps) {
               </span>
             </CardHeader>
             <CardContent className="pt-4">
-              <p className="text-3xl font-semibold tracking-[-0.03em] text-white">{stat.value}</p>
+              <p className="text-3xl font-semibold tracking-[-0.03em] text-foreground">{stat.value}</p>
             </CardContent>
           </Card>
         );
