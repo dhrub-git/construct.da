@@ -23,7 +23,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("bg-secondary/65 [&_tr]:border-b [&_tr]:border-white/8", className)}
+      className={cn("bg-secondary/65 [&_tr]:border-b [&_tr]:border-border", className)}
       {...props}
     />
   )
@@ -44,7 +44,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
     <tfoot
       data-slot="table-footer"
       className={cn(
-        "border-t border-white/8 bg-secondary/55 font-medium [&>tr]:last:border-b-0",
+        "border-t border-border bg-secondary/55 font-medium [&>tr]:last:border-b-0",
         className
       )}
       {...props}
@@ -57,7 +57,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "border-b border-white/6 transition-all duration-200 ease-out hover:bg-white/6 has-aria-expanded:bg-white/6 data-[state=selected]:bg-white/8",
+        "border-b border-border transition-all duration-200 ease-out hover:bg-secondary has-aria-expanded:bg-secondary data-[state=selected]:bg-secondary",
         className
       )}
       {...props}
@@ -70,7 +70,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "h-12 px-4 text-left align-middle text-xs font-semibold tracking-[0.06em] whitespace-nowrap text-white/72 uppercase [&:has([role=checkbox])]:pr-0",
+        "h-12 px-4 text-left align-middle text-xs font-semibold tracking-[0.06em] whitespace-nowrap text-muted-foreground uppercase [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}
@@ -83,7 +83,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
     <td
       data-slot="table-cell"
       className={cn(
-        "px-4 py-3 align-middle text-sm whitespace-nowrap text-white/88 [&:has([role=checkbox])]:pr-0",
+        "px-4 py-3 align-middle text-sm whitespace-nowrap text-foreground [&:has([role=checkbox])]:pr-0",
         className
       )}
       {...props}
@@ -98,7 +98,7 @@ function TableCaption({
   return (
     <caption
       data-slot="table-caption"
-      className={cn("mt-4 text-sm text-white/56", className)}
+      className={cn("mt-4 text-sm text-muted-foreground", className)}
       {...props}
     />
   )

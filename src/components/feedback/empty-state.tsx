@@ -25,7 +25,7 @@ export function EmptyState({ variant, action, className }: EmptyStateProps) {
   const Icon = content.icon;
 
   return (
-    <Empty className={cn("border border-white/10 bg-secondary/45", className)}>
+    <Empty className={cn("border border-border bg-secondary/45", className)}>
       <EmptyHeader>
         <EmptyMedia variant="icon" aria-hidden>
           <Icon />

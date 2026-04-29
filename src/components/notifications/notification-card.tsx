@@ -15,7 +15,7 @@ export function NotificationCard({ item }: NotificationCardProps) {
     <Card
       size="sm"
       className={cn(
-        "border-white/10 bg-secondary/45",
+        "border-border bg-secondary/45",
         item.isUnread && "border-primary/30 bg-primary/6",
       )}
     >
@@ -25,7 +25,7 @@ export function NotificationCard({ item }: NotificationCardProps) {
             "mt-0.5 flex size-10 shrink-0 items-center justify-center rounded-[12px] border",
             item.isUnread
               ? "border-primary/35 bg-primary/12 text-primary"
-              : "border-white/10 bg-secondary/80 text-white/64",
+              : "border-border bg-secondary/80 text-muted-foreground",
           )}
         >
           <Icon data-icon="inline-start" />
@@ -33,11 +33,11 @@ export function NotificationCard({ item }: NotificationCardProps) {
 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-sm font-semibold text-white/92">{item.title}</p>
+            <p className="text-sm font-semibold text-foreground">{item.title}</p>
             {item.isUnread ? <Badge variant="default">Unread</Badge> : null}
           </div>
-          <p className="text-sm leading-6 text-white/66">{item.message}</p>
-          <p className="text-xs text-white/48">{item.timestamp}</p>
+          <p className="text-sm leading-6 text-muted-foreground">{item.message}</p>
+          <p className="text-xs text-muted-foreground/80">{item.timestamp}</p>
         </div>
       </CardContent>
     </Card>

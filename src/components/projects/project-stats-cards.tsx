@@ -64,12 +64,12 @@ export function ProjectStatsCards({ workspace }: ProjectStatsCardsProps) {
 
         return (
           <Card key={stat.title} size="sm" className="h-full">
-            <CardHeader className="flex flex-row items-start justify-between gap-3 border-b border-white/8 pb-3">
+            <CardHeader className="flex flex-row items-start justify-between gap-3 border-b border-border pb-3">
               <div className="flex flex-col gap-1">
                 <CardTitle className="text-base">{stat.title}</CardTitle>
                 <CardDescription>{stat.description}</CardDescription>
               </div>
-              <span className={cn("flex size-10 items-center justify-center rounded-[12px] border border-white/10 bg-secondary/70 text-primary") }>
+              <span className={cn("flex size-10 items-center justify-center rounded-[12px] border border-border bg-secondary/70 text-primary") }>
                 <Icon />
               </span>
             </CardHeader>

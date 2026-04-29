@@ -35,8 +35,8 @@ function formatStage(stage: string): string {
 
 export function ProjectHeaderCard({ project, workspace, onProcess, processDisabled }: ProjectHeaderCardProps) {
   return (
-    <Card className="sticky top-4 z-20 border-white/12 bg-card/96 backdrop-blur-xl">
-      <CardHeader className="gap-4 border-b border-white/8 pb-4">
+    <Card className="sticky top-4 z-20 border-border bg-card/96 backdrop-blur-xl">
+      <CardHeader className="gap-4 border-b border-border pb-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex min-w-0 flex-col gap-3">
             <div className="flex flex-wrap items-center gap-2">
@@ -57,7 +57,7 @@ export function ProjectHeaderCard({ project, workspace, onProcess, processDisabl
             </div>
           </div>
 
-          <div className="flex shrink-0 flex-col gap-2 rounded-[18px] border border-white/8 bg-secondary/45 p-4">
+          <div className="flex shrink-0 flex-col gap-2 rounded-[18px] border border-border bg-secondary/45 p-4">
             <Button
               type="button"
               onClick={onProcess}
@@ -73,35 +73,35 @@ export function ProjectHeaderCard({ project, workspace, onProcess, processDisabl
               )}
               {workspace.processingActionLabel}
             </Button>
-            <p className={cn("text-xs text-muted-foreground", processDisabled && "text-white/50")}>{workspace.processingActionHint}</p>
+            <p className={cn("text-xs text-muted-foreground", processDisabled && "text-muted-foreground")}>{workspace.processingActionHint}</p>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="grid gap-4 pt-4 md:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-[16px] border border-white/8 bg-secondary/40 p-4">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-white/62">
+        <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
+          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
             <CalendarDaysIcon data-icon="inline-start" />
             Created
           </p>
           <p className="mt-2 text-sm font-medium text-white">{formatDate(project.createdAt)}</p>
         </div>
-        <div className="rounded-[16px] border border-white/8 bg-secondary/40 p-4">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-white/62">
+        <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
+          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
             <Clock3Icon data-icon="inline-start" />
             Updated
           </p>
           <p className="mt-2 text-sm font-medium text-white">{formatDate(project.updatedAt)}</p>
         </div>
-        <div className="rounded-[16px] border border-white/8 bg-secondary/40 p-4">
-          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-white/62">
+        <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
+          <p className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">
             <FileTextIcon data-icon="inline-start" />
             Files
           </p>
           <p className="mt-2 text-sm font-medium text-white">{workspace.totalFiles} documents</p>
         </div>
-        <div className="rounded-[16px] border border-white/8 bg-secondary/40 p-4">
-          <p className="text-xs font-medium uppercase tracking-[0.08em] text-white/62">Completion</p>
+        <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
+          <p className="text-xs font-medium uppercase tracking-[0.08em] text-muted-foreground">Completion</p>
           <div className="mt-3 flex items-center gap-3">
             <Progress value={workspace.completionPercent} className="flex-1" />
             <span className="text-sm font-semibold tabular-nums text-white">{workspace.completionPercent}%</span>

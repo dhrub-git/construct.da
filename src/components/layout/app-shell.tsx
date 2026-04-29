@@ -29,9 +29,9 @@ export function AppShell({ children }: AppShellProps) {
       </div>
 
       <div className="flex min-h-screen flex-col lg:pl-72">
-        <header className="sticky top-0 z-20 border-b border-white/6 bg-background/70 px-4 py-3 backdrop-blur-xl lg:hidden">
+        <header className="sticky top-0 z-20 border-b border-border bg-background/70 px-4 py-3 backdrop-blur-xl lg:hidden">
           <div className="flex items-center justify-between gap-3">
-            <Link href="/dashboard" className="text-sm font-semibold tracking-[-0.01em] text-white/92">
+            <Link href="/dashboard" className="text-sm font-semibold tracking-[-0.01em] text-foreground">
               construct.da
             </Link>
 

@@ -55,11 +55,11 @@ export function ProjectWorkflowTimeline({ workspace }: ProjectWorkflowTimelinePr
             return (
               <li key={step.key} className="flex gap-3">
                 <div className="flex flex-col items-center">
-                  <span className={cn("flex size-8 items-center justify-center rounded-full border", step.state === "completed" && "border-primary bg-primary text-primary-foreground", step.state === "active" && "border-primary bg-primary/10 text-primary", step.state === "failed" && "border-destructive bg-destructive/10 text-destructive", step.state === "pending" && "border-white/12 bg-secondary/50 text-white/60")}>
+                  <span className={cn("flex size-8 items-center justify-center rounded-full border", step.state === "completed" && "border-primary bg-primary text-primary-foreground", step.state === "active" && "border-primary bg-primary/10 text-primary", step.state === "failed" && "border-destructive bg-destructive/10 text-destructive", step.state === "pending" && "border-border bg-secondary/50 text-muted-foreground")}>
                     <Icon />
                   </span>
                   {index < workspace.workflowSteps.length - 1 ? (
-                    <Separator orientation="vertical" className="mt-2 h-7 bg-white/10" />
+                    <Separator orientation="vertical" className="mt-2 h-7 bg-secondary" />
                   ) : null}
                 </div>
                 <div className="min-w-0 flex-1 pb-3">
@@ -67,7 +67,7 @@ export function ProjectWorkflowTimeline({ workspace }: ProjectWorkflowTimelinePr
                     <p className="font-medium text-white">{step.label}</p>
                     <Badge variant={stepTone(step.state)}>{step.state}</Badge>
                   </div>
-                  {step.details ? <p className="mt-1 text-sm text-white/66">{step.details}</p> : null}
+                  {step.details ? <p className="mt-1 text-sm text-muted-foreground">{step.details}</p> : null}
                 </div>
               </li>
             );

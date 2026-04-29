@@ -35,10 +35,10 @@ export function ProjectTable({ projects }: ProjectTableProps) {
         {projects.map((project) => (
           <TableRow key={project.id}>
             <TableCell className="font-semibold text-white">{project.name}</TableCell>
-            <TableCell className="max-w-72 truncate text-white/76">{project.address}</TableCell>
-            <TableCell className="text-white/76">{project.council}</TableCell>
-            <TableCell className="text-white/76">{getProjectTypeLabel(project.type)}</TableCell>
-            <TableCell className="text-white/70">{new Date(project.createdAt).toLocaleDateString()}</TableCell>
+            <TableCell className="max-w-72 truncate text-muted-foreground">{project.address}</TableCell>
+            <TableCell className="text-muted-foreground">{project.council}</TableCell>
+            <TableCell className="text-muted-foreground">{getProjectTypeLabel(project.type)}</TableCell>
+            <TableCell className="text-muted-foreground">{new Date(project.createdAt).toLocaleDateString()}</TableCell>
             <TableCell>
               <StatusBadge status={ProjectStatus.CREATED} />
             </TableCell>

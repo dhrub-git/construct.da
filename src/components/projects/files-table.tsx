@@ -45,9 +45,9 @@ export function FilesTable({ files, onDelete, onReplace }: FilesTableProps) {
         {files.map((file) => (
           <TableRow key={file.id}>
             <TableCell className="max-w-72 truncate font-semibold text-white">{file.name}</TableCell>
-            <TableCell className="text-white/76">{file.metadata.fileType || file.metadata.mimeType}</TableCell>
-            <TableCell className="text-white/76">{formatBytes(file.metadata.size)}</TableCell>
-            <TableCell className="text-white/70">{new Date(file.createdAt).toLocaleString()}</TableCell>
+            <TableCell className="text-muted-foreground">{file.metadata.fileType || file.metadata.mimeType}</TableCell>
+            <TableCell className="text-muted-foreground">{formatBytes(file.metadata.size)}</TableCell>
+            <TableCell className="text-muted-foreground">{new Date(file.createdAt).toLocaleString()}</TableCell>
             <TableCell>
               <StatusBadge status={file.status} />
             </TableCell>

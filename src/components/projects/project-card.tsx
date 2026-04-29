@@ -17,7 +17,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
         <CardTitle>{project.name}</CardTitle>
         <CardDescription>{project.address}</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-col gap-2 text-sm text-white/68">
+      <CardContent className="flex flex-col gap-2 text-sm text-muted-foreground">
         <p>Council: {project.council}</p>
         <p>Type: {getProjectTypeLabel(project.type)}</p>
         <p>Created: {new Date(project.createdAt).toLocaleDateString()}</p>

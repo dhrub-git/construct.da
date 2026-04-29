@@ -388,16 +388,16 @@ export function CreateProjectDialog({
 
           {step === 3 ? (
             <div className="flex flex-col gap-3 max-h-[65vh] overflow-y-auto">
-              <div className="rounded-[14px] border border-white/10 bg-secondary/55 p-4 text-sm">
-                <p className="font-semibold text-white/90">
+              <div className="rounded-[14px] border border-border bg-secondary/55 p-4 text-sm">
+                <p className="font-semibold text-foreground">
                   DA submission checklist
                 </p>
-                <p className="text-xs leading-6 text-white/64">
+                <p className="text-xs leading-6 text-muted-foreground">
                   Upload through a document card to auto-map the correct file
                   type. Use “Other Supporting Documents” for anything outside
                   the standard set.
                 </p>
-                <p className="mt-2 text-xs text-white/64">
+                <p className="mt-2 text-xs text-muted-foreground">
                   {uploadedFiles.length} file
                   {uploadedFiles.length === 1 ? "" : "s"} uploaded across{" "}
                   {uploadedDocumentCount} / {totalDocumentDefinitions}{" "}
@@ -414,7 +414,7 @@ export function CreateProjectDialog({
               />
 
               {uploadedFiles.length === 0 ? (
-                <div className="rounded-[14px] border border-dashed border-white/16 bg-secondary/35 p-4 text-sm text-white/60">
+                <div className="rounded-[14px] border border-dashed border-border bg-secondary/35 p-4 text-sm text-muted-foreground">
                   Start by uploading at least one core document such as Site
                   Plan, Floor Plans, or SEE.
                 </div>

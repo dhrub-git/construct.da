@@ -29,9 +29,9 @@ export function DashboardSkeleton() {
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             <Skeleton className="h-10 w-full" />
-            <div className="rounded-[18px] border border-white/8 bg-secondary/35 p-3">
+            <div className="rounded-[18px] border border-border bg-secondary/35 p-3">
               <Skeleton className="h-10 w-full" />
-              <div className="mt-3 hidden grid-cols-7 gap-3 rounded-[14px] border border-white/8 bg-secondary/55 px-4 py-3 lg:grid">
+              <div className="mt-3 hidden grid-cols-7 gap-3 rounded-[14px] border border-border bg-secondary/55 px-4 py-3 lg:grid">
                 {Array.from({ length: 7 }).map((_, index) => (
                   <Skeleton key={`dashboard-table-head-${index}`} className="h-3 w-full" />
                 ))}
@@ -54,7 +54,7 @@ export function DashboardSkeleton() {
             {Array.from({ length: SKELETON_LAYOUT.dashboard.activityRows }).map((_, index) => (
               <div
                 key={`dashboard-activity-row-${index}`}
-                className="rounded-[14px] border border-white/10 bg-secondary/45 p-3"
+                className="rounded-[14px] border border-border bg-secondary/45 p-3"
               >
                 <Skeleton className="h-4 w-full" />
                 <Skeleton className="mt-2 h-3 w-2/3" />

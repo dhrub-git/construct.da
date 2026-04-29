@@ -9,13 +9,13 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default:
-          "bg-linear-to-b from-[#35ecdd] to-primary text-primary-foreground shadow-[0_10px_24px_rgba(46,230,214,0.25)] hover:-translate-y-px hover:from-[#40f4e5] hover:to-[#22cfc1] hover:shadow-[0_14px_30px_rgba(46,230,214,0.32)]",
+          "bg-primary text-primary-foreground shadow-[0_10px_24px_rgba(63,111,101,0.22)] hover:-translate-y-px hover:bg-[#345f56] hover:shadow-[0_14px_30px_rgba(63,111,101,0.28)]",
         outline:
-          "border-border bg-secondary/75 text-white/88 hover:-translate-y-px hover:border-white/20 hover:bg-secondary aria-expanded:bg-secondary aria-expanded:text-foreground",
+          "border-border bg-card/75 text-foreground hover:-translate-y-px hover:border-primary/35 hover:bg-secondary aria-expanded:bg-secondary aria-expanded:text-foreground",
         secondary:
-          "border border-border bg-white/5 text-white/84 hover:-translate-y-px hover:border-white/20 hover:bg-white/10 aria-expanded:border-white/20",
+          "border border-border bg-secondary text-secondary-foreground hover:-translate-y-px hover:border-primary/30 hover:bg-[#e2d7c5] aria-expanded:border-primary/30",
         ghost:
-          "text-white/78 hover:-translate-y-px hover:bg-white/8 hover:text-white aria-expanded:bg-white/8 aria-expanded:text-white",
+          "text-muted-foreground hover:-translate-y-px hover:bg-secondary hover:text-foreground aria-expanded:bg-secondary aria-expanded:text-foreground",
         destructive:
           "bg-destructive text-white shadow-[0_8px_20px_rgba(239,68,68,0.25)] hover:-translate-y-px hover:bg-red-500 hover:shadow-[0_12px_26px_rgba(239,68,68,0.32)] focus-visible:border-red-300/50 focus-visible:ring-red-400/35",
         link: "text-primary underline-offset-4 hover:underline",

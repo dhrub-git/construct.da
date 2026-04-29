@@ -17,7 +17,7 @@ export function InlineError({ variant, message, onRetry }: InlineErrorProps) {
   const content = ERROR_STATE_CONTENT[variant];
 
   return (
-    <Alert variant="destructive" className="rounded-[14px] border-white/14 bg-destructive/10 p-4">
+    <Alert variant="destructive" className="rounded-[14px] border-border bg-destructive/10 p-4">
       <AlertCircleIcon aria-hidden />
       <AlertTitle>{content.title}</AlertTitle>
       <AlertDescription>{message ?? content.message}</AlertDescription>

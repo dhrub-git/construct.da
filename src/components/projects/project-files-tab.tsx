@@ -113,9 +113,9 @@ export function ProjectFilesTab({
                 {workspace.fileRows.map((file) => (
                   <TableRow key={file.id}>
                     <TableCell className="max-w-64 truncate font-semibold text-white">{file.name}</TableCell>
-                    <TableCell className="text-white/76">{file.type}</TableCell>
-                    <TableCell className="text-white/76">{formatBytes(file.size)}</TableCell>
-                    <TableCell className="text-white/72">{formatDate(file.uploadedAt)}</TableCell>
+                    <TableCell className="text-muted-foreground">{file.type}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatBytes(file.size)}</TableCell>
+                    <TableCell className="text-muted-foreground">{formatDate(file.uploadedAt)}</TableCell>
                     <TableCell><StatusBadge status={file.status} /></TableCell>
                     <TableCell>
                       <Badge variant={file.includedInReport ? "default" : "secondary"}>

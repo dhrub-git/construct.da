@@ -49,7 +49,7 @@ export function Streamdown({
 
   if (!markdown) {
     return (
-      <Empty className={cn("border border-white/10 bg-secondary/40", className)}>
+      <Empty className={cn("border border-border bg-secondary/40", className)}>
         <EmptyHeader>
           <EmptyMedia variant="icon" aria-hidden>
             <span className="text-lg font-semibold">R</span>

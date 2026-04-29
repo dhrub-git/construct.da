@@ -42,7 +42,7 @@ export function NotificationList({ groups }: NotificationListProps) {
         {hasItems ? (
           filteredGroups.map((group) => (
             <section key={group.id} className="flex flex-col gap-3">
-              <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-white/56">
+              <h3 className="text-sm font-semibold uppercase tracking-[0.12em] text-muted-foreground">
                 {group.label}
               </h3>
               <div className="grid gap-3">

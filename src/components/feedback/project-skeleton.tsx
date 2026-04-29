@@ -7,7 +7,7 @@ export function ProjectSkeleton() {
   return (
     <PageSkeleton titleWidthClass="w-96" subtitleWidthClass="w-80" actionWidthClass="w-32">
       <Card>
-        <CardHeader className="flex flex-col gap-4 border-b border-white/8 pb-4 lg:flex-row lg:items-start lg:justify-between">
+        <CardHeader className="flex flex-col gap-4 border-b border-border pb-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-col gap-3">
             <div className="flex flex-wrap gap-2">
               <Skeleton className="h-7 w-28 rounded-full" />
@@ -21,7 +21,7 @@ export function ProjectSkeleton() {
         </CardHeader>
         <CardContent className="grid gap-4 pt-4 md:grid-cols-2 xl:grid-cols-4">
           {Array.from({ length: 4 }).map((_, index) => (
-            <div key={`project-header-meta-${index}`} className="rounded-[16px] border border-white/8 bg-secondary/40 p-4">
+            <div key={`project-header-meta-${index}`} className="rounded-[16px] border border-border bg-secondary/40 p-4">
               <Skeleton className="h-3 w-20" />
               <Skeleton className="mt-3 h-5 w-full" />
             </div>
@@ -30,13 +30,13 @@ export function ProjectSkeleton() {
       </Card>
 
       <Card>
-        <CardHeader className="border-b border-white/8 pb-4">
+        <CardHeader className="border-b border-border pb-4">
           <Skeleton className="h-10 w-80 max-w-full rounded-[14px]" />
         </CardHeader>
         <CardContent className="flex flex-col gap-6 pt-4">
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: SKELETON_LAYOUT.project.metaCards }).map((_, index) => (
-              <div key={`project-metric-${index}`} className="rounded-[18px] border border-white/8 bg-secondary/40 p-4">
+              <div key={`project-metric-${index}`} className="rounded-[18px] border border-border bg-secondary/40 p-4">
                 <Skeleton className="h-4 w-24" />
                 <Skeleton className="mt-4 h-8 w-16" />
                 <Skeleton className="mt-2 h-4 w-40 max-w-full" />
@@ -45,7 +45,7 @@ export function ProjectSkeleton() {
           </div>
 
           <div className="grid gap-4 xl:grid-cols-2">
-            <div className="rounded-[18px] border border-white/8 bg-secondary/40 p-4">
+            <div className="rounded-[18px] border border-border bg-secondary/40 p-4">
               <Skeleton className="h-5 w-48" />
               <div className="mt-4 flex flex-col gap-3">
                 {Array.from({ length: 6 }).map((_, index) => (
@@ -53,7 +53,7 @@ export function ProjectSkeleton() {
                 ))}
               </div>
             </div>
-            <div className="rounded-[18px] border border-white/8 bg-secondary/40 p-4">
+            <div className="rounded-[18px] border border-border bg-secondary/40 p-4">
               <Skeleton className="h-5 w-32" />
               <div className="mt-4 flex flex-col gap-3">
                 {Array.from({ length: SKELETON_LAYOUT.project.activityRows }).map((_, index) => (

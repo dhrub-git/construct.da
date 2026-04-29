@@ -1,9 +1,18 @@
+![construct.da development approval advisory workspace](public/da-approval-hero-v2.png)
+
 # construct.da
+
+![Next.js 16](https://img.shields.io/badge/Next.js-16-000000?logo=nextdotjs&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![Tailwind CSS v4](https://img.shields.io/badge/Tailwind%20CSS-v4-38BDF8?logo=tailwindcss&logoColor=white)
+![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-components-111827)
+![Vitest](https://img.shields.io/badge/Vitest-tested-6E9F18?logo=vitest&logoColor=white)
+![Advisory MVP](https://img.shields.io/badge/Advisory-MVP-3F6F65)
+![Hackathon 2026](https://img.shields.io/badge/Codex%20Hackathon-2026-C48232)
 
 Advisory-first DA approval screening for Australian residential projects.
 
-This repository contains a Next.js App Router MVP for pre-lodgement review. The product helps users capture project context, upload supporting files, run an automated processing workflow, and view an evidence-backed compliance-style report before formal council or certifier review.
-
+This repository contains a Next.js App Router MVP for pre-lodgement clarity. The product helps users capture project context, upload supporting files, run an automated processing workflow, and view an evidence-backed compliance-style report before formal council or certifier review.
 
 ## Codex Hackathon provenance
 

@@ -55,7 +55,7 @@ export function ProjectReportTab({ workspace }: ProjectReportTabProps) {
       ) : null}
 
       <Card>
-        <CardHeader className="flex flex-col gap-4 border-b border-white/8 pb-4 lg:flex-row lg:items-start lg:justify-between">
+        <CardHeader className="flex flex-col gap-4 border-b border-border pb-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="flex flex-col gap-2">
             <CardTitle className="flex items-center gap-2">
               <FileTextIcon data-icon="inline-start" />
@@ -76,16 +76,16 @@ export function ProjectReportTab({ workspace }: ProjectReportTabProps) {
 
         <CardContent className="grid gap-4 pt-4 xl:grid-cols-[1fr_auto]">
           <div className="grid gap-3 sm:grid-cols-3">
-            <div className="rounded-[16px] border border-white/8 bg-secondary/40 p-4">
-              <p className="text-xs uppercase tracking-[0.08em] text-white/56">Generated at</p>
+            <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
+              <p className="text-xs uppercase tracking-[0.08em] text-muted-foreground">Generated at</p>
               <p className="mt-2 text-sm font-medium text-white">{workspace.reportMetadata?.generatedAt ?? "—"}</p>
             </div>
-            <div className="rounded-[16px] border border-white/8 bg-secondary/40 p-4">
-              <p className="text-xs uppercase tracking-[0.08em] text-white/56">Source files</p>
+            <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
+              <p className="text-xs uppercase tracking-[0.08em] text-muted-foreground">Source files</p>
               <p className="mt-2 text-sm font-medium text-white">{workspace.reportMetadata?.sourceFilesCount ?? 0}</p>
             </div>
-            <div className="rounded-[16px] border border-white/8 bg-secondary/40 p-4">
-              <p className="text-xs uppercase tracking-[0.08em] text-white/56">Current score</p>
+            <div className="rounded-[16px] border border-border bg-secondary/40 p-4">
+              <p className="text-xs uppercase tracking-[0.08em] text-muted-foreground">Current score</p>
               <p className="mt-2 text-sm font-medium text-white">{workspace.latestReport ? `${workspace.latestReport.score}/100` : "—"}</p>
             </div>
           </div>

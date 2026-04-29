@@ -72,9 +72,9 @@ export function ProjectFileDropzone({ accept, disabled, onUploaded }: ProjectFil
       className={cn(
         "flex flex-col gap-4 rounded-[20px] border-2 border-dashed p-5 transition-colors",
         state === "dragging" && "border-primary bg-primary/8",
-        state === "uploading" && "border-white/16 bg-secondary/55",
+        state === "uploading" && "border-border bg-secondary/55",
         state === "error" && "border-destructive bg-destructive/8",
-        state === "idle" && "border-white/12 bg-secondary/40 hover:border-white/18",
+        state === "idle" && "border-border bg-secondary/40 hover:border-border",
         disabled && "pointer-events-none opacity-60",
       )}
       onDragOver={(event) => {
@@ -120,7 +120,7 @@ export function ProjectFileDropzone({ accept, disabled, onUploaded }: ProjectFil
         <p className="text-sm font-semibold text-white">
           {state === "dragging" ? "Drop to upload" : "Upload a new file"}
         </p>
-        <p className="text-sm text-white/64">
+        <p className="text-sm text-muted-foreground">
           Drag and drop a document or browse to upload it to this project.
         </p>
       </div>
@@ -145,7 +145,7 @@ export function ProjectFileDropzone({ accept, disabled, onUploaded }: ProjectFil
       {state === "uploading" ? (
         <div className="flex flex-col gap-2">
           <Progress value={progress} />
-          <p className="text-xs text-white/56 tabular-nums">{Math.round(progress)}% uploaded</p>
+          <p className="text-xs text-muted-foreground tabular-nums">{Math.round(progress)}% uploaded</p>
         </div>
       ) : null}
 

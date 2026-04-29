@@ -71,7 +71,7 @@ export function DashboardPageClient({ userId }: DashboardPageClientProps) {
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div className="flex flex-col gap-1">
           <h1 className="text-[32px] font-bold tracking-[-0.02em]">{DASHBOARD_COPY.heading}</h1>
-          <p className="text-sm text-white/72">
+          <p className="text-sm text-muted-foreground">
             {DASHBOARD_COPY.description}
           </p>
         </div>
@@ -87,7 +87,7 @@ export function DashboardPageClient({ userId }: DashboardPageClientProps) {
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
           <div className="relative max-w-lg">
-            <SearchIcon className="pointer-events-none absolute top-3.5 left-3.5 text-white/56" data-icon="inline-start" />
+            <SearchIcon className="pointer-events-none absolute top-3.5 left-3.5 text-muted-foreground" data-icon="inline-start" />
             <Input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
@@ -98,8 +98,8 @@ export function DashboardPageClient({ userId }: DashboardPageClientProps) {
           </div>
 
           {loading ? (
-            <div className="rounded-[18px] border border-white/10 bg-secondary/45 p-3">
-              <div className="hidden grid-cols-7 gap-3 rounded-[14px] border border-white/8 bg-secondary/55 px-4 py-3 lg:grid">
+            <div className="rounded-[18px] border border-border bg-secondary/45 p-3">
+              <div className="hidden grid-cols-7 gap-3 rounded-[14px] border border-border bg-secondary/55 px-4 py-3 lg:grid">
                 {Array.from({ length: 7 }).map((_, index) => (
                   <Skeleton key={`dashboard-head-skeleton-${index}`} className="h-3 w-full" />
                 ))}

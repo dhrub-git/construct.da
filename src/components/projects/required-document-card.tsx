@@ -50,7 +50,7 @@ export function RequiredDocumentCard({
     <Card size="sm" className="h-full bg-secondary/55">
       <CardHeader>
         <div className="flex items-start justify-between gap-2">
-          <div className="rounded-[12px] border border-white/10 bg-secondary/80 p-2 text-primary">
+          <div className="rounded-[12px] border border-border bg-secondary/80 p-2 text-primary">
             <Icon className="size-4" />
           </div>
           <div className="flex items-center gap-1">
@@ -69,10 +69,10 @@ export function RequiredDocumentCard({
 
       <CardContent className="flex flex-col gap-2">
         {hasUploads ? (
-          <ul className="flex max-h-28 flex-col gap-1 overflow-y-auto rounded-[12px] border border-white/10 bg-secondary/35 p-2">
+          <ul className="flex max-h-28 flex-col gap-1 overflow-y-auto rounded-[12px] border border-border bg-secondary/35 p-2">
             {uploads.map((uploadItem) => (
               <li key={uploadItem.id} className="flex items-center justify-between gap-2 text-xs">
-                <span className="truncate text-white/64">{uploadItem.file.name}</span>
+                <span className="truncate text-muted-foreground">{uploadItem.file.name}</span>
                 <Button
                   type="button"
                   variant="ghost"
@@ -87,7 +87,7 @@ export function RequiredDocumentCard({
             ))}
           </ul>
         ) : (
-          <div className="rounded-[12px] border border-dashed border-white/16 bg-secondary/35 px-3 py-2 text-xs text-white/56">
+          <div className="rounded-[12px] border border-dashed border-border bg-secondary/35 px-3 py-2 text-xs text-muted-foreground">
             No files uploaded for this category yet.
           </div>
         )}
@@ -101,7 +101,7 @@ export function RequiredDocumentCard({
           onUploaded={(blob, file) => onUploaded(document, blob, file)}
         />
         {document.allowMultiple ? (
-          <p className="text-xs text-white/56">Multiple files allowed for this category.</p>
+          <p className="text-xs text-muted-foreground">Multiple files allowed for this category.</p>
         ) : null}
       </CardFooter>
     </Card>
