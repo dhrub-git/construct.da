@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clearCouncilCache,
   getAddressSuggestions,
@@ -179,5 +179,22 @@ describe("getAddressSuggestions", () => {
     expect(suggestions).toHaveLength(3);
     expect(suggestions[2].council).toBe("Unknown council");
     expect(suggestions[2].state).toBe("QLD");
+  });
+
+  it("returns an empty list when autocomplete is unavailable", async () => {
+    const fetchImpl = vi.fn(async () => ({
+      ok: false,
+      status: 403,
+      json: async () => ({}),
+    })) as unknown as typeof fetch;
+
+    await expect(
+      getAddressSuggestions({
+        query: "15A Ross Street",
+        googleApiKey: "google-key",
+        geoscapeApiKey: "geoscape-key",
+        fetcher: fetchImpl,
+      }),
+    ).resolves.toEqual([]);
   });
 });

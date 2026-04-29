@@ -15,7 +15,7 @@ export function ProjectCard({ project }: ProjectCardProps) {
   const status = getDashboardProjectStatus(project);
 
   return (
-    <Card size="sm" className="bg-card/88 shadow-[0_12px_30px_rgb(36_33_28_/_0.08)]">
+    <Card size="sm" className="bg-card/88 shadow-[0_12px_30px_rgb(15_23_42_/_0.08)]">
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
           <CardTitle>{project.name}</CardTitle>

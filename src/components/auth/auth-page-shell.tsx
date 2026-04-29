@@ -48,8 +48,8 @@ export function AuthPageShell({
 }: AuthPageShellProps) {
   return (
     <main className="relative isolate min-h-svh overflow-hidden bg-background text-foreground">
-      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top_left,rgb(63_111_101_/_0.14),transparent_32rem),linear-gradient(180deg,var(--background),var(--secondary))]" />
-      <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgb(36_33_28_/_0.035)_1px,transparent_1px),linear-gradient(90deg,rgb(36_33_28_/_0.035)_1px,transparent_1px)] bg-[size:28px_28px]" />
+      <div className="absolute inset-0 -z-20 bg-[radial-gradient(circle_at_top_left,rgb(30_58_138_/_0.14),transparent_32rem),linear-gradient(180deg,var(--background),var(--secondary))]" />
+      <div className="absolute inset-0 -z-10 bg-[linear-gradient(rgb(15_23_42_/_0.035)_1px,transparent_1px),linear-gradient(90deg,rgb(15_23_42_/_0.035)_1px,transparent_1px)] bg-[size:28px_28px]" />
 
       <div className="mx-auto grid min-h-svh w-full max-w-7xl gap-10 px-5 py-6 sm:px-8 lg:grid-cols-[minmax(0,1fr)_minmax(380px,440px)] lg:grid-rows-[auto_auto] lg:items-center lg:px-10">
         <section className="flex min-w-0 flex-col gap-8 lg:col-start-1 lg:row-start-1 lg:max-w-2xl lg:self-end">
@@ -57,7 +57,7 @@ export function AuthPageShell({
             href="/"
             aria-label="construct.da home"
             className={cn(
-              "inline-flex min-h-11 w-fit items-center gap-3 rounded-full border bg-card/82 px-3 py-2 text-primary shadow-[0_10px_30px_rgb(36_33_28_/_0.06)] backdrop-blur-sm",
+              "inline-flex min-h-11 w-fit items-center gap-3 rounded-full border bg-card/82 px-3 py-2 text-primary shadow-[0_10px_30px_rgb(15_23_42_/_0.06)] backdrop-blur-sm",
               "transition-colors duration-200 hover:border-primary/30 hover:bg-card focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
             )}
           >
@@ -92,7 +92,7 @@ export function AuthPageShell({
 
         <section
           aria-label="Account access form"
-          className="w-full rounded-[2rem] border bg-card/74 p-2 shadow-[0_24px_70px_rgb(36_33_28_/_0.14)] backdrop-blur-xl lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center"
+          className="w-full rounded-[2rem] border bg-card/74 p-2 shadow-[0_24px_70px_rgb(15_23_42_/_0.14)] backdrop-blur-xl lg:col-start-2 lg:row-span-2 lg:row-start-1 lg:self-center"
         >
           <div className="rounded-[1.5rem] bg-card/92 p-1">{children}</div>
         </section>
@@ -101,7 +101,7 @@ export function AuthPageShell({
           {trustPoints.map((point) => (
             <div
               key={point.title}
-              className="flex gap-3 rounded-2xl border bg-card/72 p-4 shadow-[0_12px_32px_rgb(36_33_28_/_0.055)] backdrop-blur-sm"
+              className="flex gap-3 rounded-2xl border bg-card/72 p-4 shadow-[0_12px_32px_rgb(15_23_42_/_0.055)] backdrop-blur-sm"
             >
               <dt className="mt-0.5">
                 <span className="flex size-9 items-center justify-center rounded-full bg-primary/10 text-primary">

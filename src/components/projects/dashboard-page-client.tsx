@@ -105,7 +105,7 @@ function DashboardMetricCard({
     <Card
       size="sm"
       className={cn(
-        "h-full bg-card/82 shadow-[0_14px_34px_rgb(36_33_28_/_0.07)]",
+        "h-full bg-card/82 shadow-[0_14px_34px_rgb(15_23_42_/_0.07)]",
         definition.emphasis === "primary" && "border-primary/25",
         definition.emphasis === "warning" && "border-accent/35",
         definition.emphasis === "success" && "border-emerald-600/25",
@@ -177,7 +177,7 @@ export function DashboardPageClient({ userId }: DashboardPageClientProps) {
 
   return (
     <div className="mx-auto flex w-full max-w-7xl flex-col gap-8 px-5 py-8 sm:px-6 lg:px-10 lg:py-12">
-      <section className="rounded-[28px] border bg-card/74 p-5 shadow-[0_18px_54px_rgb(36_33_28_/_0.08)] backdrop-blur-sm sm:p-7">
+      <section className="rounded-[28px] border bg-card/74 p-5 shadow-[0_18px_54px_rgb(15_23_42_/_0.08)] backdrop-blur-sm sm:p-7">
         <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
           <div className="flex max-w-3xl flex-col gap-4">
             <div className="flex flex-wrap gap-2">
@@ -217,7 +217,7 @@ export function DashboardPageClient({ userId }: DashboardPageClientProps) {
         </div>
       </section>
 
-      <Card className="bg-card/86 shadow-[0_18px_54px_rgb(36_33_28_/_0.08)]">
+      <Card className="bg-card/86 shadow-[0_18px_54px_rgb(15_23_42_/_0.08)]">
         <CardHeader className="gap-4 border-b border-border pb-5">
           <div className="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
             <div className="space-y-2">

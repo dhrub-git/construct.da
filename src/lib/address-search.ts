@@ -194,22 +194,28 @@ async function fetchAutocompletePredictions(
   apiKey: string,
   fetcher: typeof fetch = fetch,
 ): Promise<{ placeId: string }[]> {
-  const autoResponse = await fetcher(GOOGLE_AUTOCOMPLETE_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Goog-Api-Key": apiKey,
-      "X-Goog-FieldMask": "suggestions.placePrediction.placeId,suggestions.placePrediction.text.text",
-    },
-    body: JSON.stringify({
-      input: query,
-      includedRegionCodes: ["AU"],
-    }),
-    cache: "no-store",
-  });
+  let autoResponse: Response;
+
+  try {
+    autoResponse = await fetcher(GOOGLE_AUTOCOMPLETE_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+        "X-Goog-FieldMask": "suggestions.placePrediction.placeId,suggestions.placePrediction.text.text",
+      },
+      body: JSON.stringify({
+        input: query,
+        includedRegionCodes: ["AU"],
+      }),
+      cache: "no-store",
+    });
+  } catch {
+    return [];
+  }
 
   if (!autoResponse.ok) {
-    throw new Error(`Autocomplete failed with status ${autoResponse.status}`);
+    return [];
   }
 
   const autoData = (await autoResponse.json()) as GoogleAutocompleteResponse;

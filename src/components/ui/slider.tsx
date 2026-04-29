@@ -34,7 +34,7 @@ function Slider({
         >
           <SliderPrimitive.Indicator
             data-slot="slider-range"
-            className="bg-primary shadow-[0_0_0_1px_rgba(46,230,214,0.28)] select-none data-horizontal:h-full data-vertical:w-full"
+            className="bg-primary shadow-[0_0_0_1px_rgb(30_58_138_/_0.28)] select-none data-horizontal:h-full data-vertical:w-full"
           />
         </SliderPrimitive.Track>
         {Array.from({ length: _values.length }, (_, index) => (

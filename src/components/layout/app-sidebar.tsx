@@ -23,11 +23,15 @@ export function AppSidebar({ className, onNavigate }: AppSidebarProps) {
     >
       <Link
         href="/dashboard"
-        className="rounded-[14px] border border-border bg-secondary/75 px-4 py-4 transition-all duration-200 ease-out hover:border-border hover:bg-secondary"
+        className="rounded-[14px] border border-sidebar-border bg-sidebar-accent px-4 py-4 shadow-[0_10px_24px_rgb(15_23_42_/_0.05)] transition-all duration-200 ease-out hover:border-primary/25 hover:bg-card"
         onClick={onNavigate}
       >
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">construct.da</p>
-        <p className="text-lg font-semibold tracking-[-0.02em] text-white">Approvals Workspace</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+          construct.da
+        </p>
+        <p className="mt-1 text-lg font-semibold leading-tight tracking-[-0.02em] text-sidebar-foreground">
+          Approvals Workspace
+        </p>
       </Link>
 
       <Separator className="my-4" />

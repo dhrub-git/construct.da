@@ -8,6 +8,8 @@ export const authClerkAppearance = {
     colorPrimary: "var(--primary)",
     colorText: "var(--foreground)",
     colorTextSecondary: "var(--muted-foreground)",
+    fontFamily: "var(--font-source-sans), ui-sans-serif, system-ui, sans-serif",
+    fontFamilyButtons: "var(--font-source-sans), ui-sans-serif, system-ui, sans-serif",
   },
   elements: {
     rootBox: "w-full",

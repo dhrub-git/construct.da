@@ -36,7 +36,7 @@ export function SidebarNav({ links, onNavigate }: SidebarNavProps) {
             className={cn(
               "group flex items-center gap-3 rounded-[14px] border px-3 py-3 transition-all duration-200 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/45",
               active
-                ? "border-primary/40 bg-primary/12 text-primary shadow-[0_8px_20px_rgba(46,230,214,0.16)]"
+                ? "border-primary/40 bg-primary/12 text-primary shadow-[0_8px_20px_rgb(30_58_138_/_0.16)]"
                 : "border-transparent text-muted-foreground hover:-translate-y-px hover:border-border hover:bg-secondary hover:text-foreground",
             )}
             aria-current={active ? "page" : undefined}
