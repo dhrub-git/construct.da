@@ -2,7 +2,9 @@ import { withWorkflow } from "workflow/next";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-	// … rest of your Next.js config
+	turbopack: {
+		root: process.cwd(),
+	},
 };
 
 export default withWorkflow(nextConfig);

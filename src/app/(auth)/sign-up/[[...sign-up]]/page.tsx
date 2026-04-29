@@ -36,7 +36,7 @@ export default async function SignUpPage() {
             },
           }}
           signInUrl="/sign-in"
-          forceRedirectUrl="/welcome"
+          forceRedirectUrl="/dashboard"
         />
       </div>
     </div>
