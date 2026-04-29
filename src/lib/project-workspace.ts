@@ -9,6 +9,7 @@ import {
   ProjectStatus,
   ProjectStrict,
 } from "@models/data";
+import { normalizeSpatialConstraintMetadata, type SpatialConstraint, type SpatialConstraintSource } from "@/lib/spatial";
 
 type WorkflowConnectionState = {
   connected: boolean;
@@ -70,6 +71,10 @@ export type ProjectWorkspaceState = {
   }>;
   processingActionLabel: string;
   processingActionHint: string;
+  spatialConstraints: SpatialConstraint[];
+  hasSpatialConstraints: boolean;
+  spatialConstraintSource: SpatialConstraintSource | null;
+  spatialConstraintsLoadedAt: string | null;
 };
 
 function asDate(value: string | Date | null | undefined): Date | null {
@@ -265,6 +270,8 @@ export function deriveProjectWorkspaceState(
   const stage = mapProjectStage(project.metadata, latestReport, isProcessing);
   const lastRunDurationMs = project.metadata.lastRunDurationMs ?? null;
   const reportMarkdown = latestReport ? buildProjectReportMarkdown(latestReport) : null;
+  const spatialMetadata = normalizeSpatialConstraintMetadata(project.metadata);
+  const spatialConstraints = spatialMetadata.spatialConstraints;
   const reportMetadata = latestReport
     ? {
         generatedAt: formatIsoDate(latestReport.createdAt),
@@ -348,6 +355,10 @@ export function deriveProjectWorkspaceState(
     })),
     processingActionLabel: buildProcessingActionLabel(isProcessing, status, hasReport, needsRerun),
     processingActionHint: buildProcessingActionHint(isProcessing, hasReport, needsRerun, pendingFiles, failedFiles),
+    spatialConstraints,
+    hasSpatialConstraints: spatialConstraints.length > 0,
+    spatialConstraintSource: spatialMetadata.spatialConstraintsSource ?? null,
+    spatialConstraintsLoadedAt: spatialMetadata.spatialConstraintsLoadedAt ?? null,
   };
 }
 

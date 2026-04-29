@@ -4,6 +4,7 @@ import prisma from "../prisma";
 import { addressToCoordinatesGoogle } from "../geoEncoding";
 import { Prisma } from "@prisma/client";
 import { ExtractedFacts, RulesPack } from "../agent/types";
+import { buildFixtureSpatialConstraints, SpatialConstraintSource, SPATIAL_FIXTURE_RETRIEVED_AT } from "../spatial";
 
 
 export async function getProjectsForUser(userId: string): Promise<ProjectStrict[]> {
@@ -33,6 +34,11 @@ export async function createProject(projectSpecs: ProjectSpecs): Promise<Project
             throw new Error(`Failed to geocode the provided address: ${projectSpecs.address}`);
         }
 
+        const spatialConstraints = buildFixtureSpatialConstraints({
+            address: projectSpecs.address,
+            council: projectSpecs.council,
+        });
+
         const newProject = await prisma.project.create({
             data: {
                 name: projectSpecs.name,
@@ -50,6 +56,9 @@ export async function createProject(projectSpecs: ProjectSpecs): Promise<Project
                     stage: projectSpecs.files.length > 0 ? ProjectStage.FILES_UPLOADED : ProjectStage.CREATED,
                     processingStatus: projectSpecs.files.length > 0 ? ProjectStatus.NEEDS_REVIEW : ProjectStatus.CREATED,
                     filesUpdatedAt: projectSpecs.files.length > 0 ? new Date().toISOString() : undefined,
+                    spatialConstraints,
+                    spatialConstraintsLoadedAt: SPATIAL_FIXTURE_RETRIEVED_AT,
+                    spatialConstraintsSource: SpatialConstraintSource.FIXTURE,
                 },
                 Files: {
                     createMany: {

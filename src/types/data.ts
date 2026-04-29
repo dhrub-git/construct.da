@@ -1,5 +1,6 @@
 import { ChecksResult, ExtractedFacts, ReportSummary, RulesPack, WorkflowIssue } from "@/lib/agent/types";
 import type { Files, Project, ProjectReport, ProjectReportCheckResult, ProjectReportFinding } from "@prisma/client";
+import type { SpatialConstraint, SpatialConstraintSource } from "@/lib/spatial";
 
 export const FileStatus = {
     PENDING: "PENDING",
@@ -52,6 +53,9 @@ export interface ProjectMetadata {
     filesUpdatedAt?: string;
     reportVersion?: number;
     lastRunDurationMs?: number;
+    spatialConstraints?: SpatialConstraint[];
+    spatialConstraintsLoadedAt?: string;
+    spatialConstraintsSource?: SpatialConstraintSource;
 }
 
 export interface ProjectSpecs {

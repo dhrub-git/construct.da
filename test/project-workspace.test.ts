@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ProjectStage, ProjectStatus, type GenerateProjectReport, type FilesStrict, type ProjectStrict } from "@models/data";
+import { buildFixtureSpatialConstraints, SpatialConstraintSource } from "@/lib/spatial";
 
 import { buildProjectReportMarkdown, deriveProjectWorkspaceState } from "@/lib/project-workspace";
 
@@ -166,6 +167,46 @@ describe("project workspace helpers", () => {
     expect(state.hasReport).toBe(true);
     expect(state.processingActionLabel).toBe("Re-run Report");
     expect(state.reportMetadata?.version).toBe(2);
+  });
+
+  it("exposes spatial constraints from project metadata", () => {
+    const spatialConstraints = buildFixtureSpatialConstraints({
+      address: "1 Example Street",
+      council: "Sample Council",
+    });
+
+    const state = deriveProjectWorkspaceState(
+      createProject({
+        metadata: {
+          ...createProject().metadata,
+          spatialConstraints,
+          spatialConstraintsLoadedAt: "2026-04-29T00:00:00.000Z",
+          spatialConstraintsSource: SpatialConstraintSource.FIXTURE,
+        },
+      }),
+      [],
+      [],
+      { connected: false, loading: false, fileStatus: null, reportStatus: null },
+    );
+
+    expect(state.hasSpatialConstraints).toBe(true);
+    expect(state.spatialConstraints).toHaveLength(5);
+    expect(state.spatialConstraints[0]?.value).toBe("R2 Low Density Residential");
+    expect(state.spatialConstraintSource).toBe(SpatialConstraintSource.FIXTURE);
+    expect(state.spatialConstraintsLoadedAt).toBe("2026-04-29T00:00:00.000Z");
+  });
+
+  it("safely defaults missing spatial constraints to an empty list", () => {
+    const state = deriveProjectWorkspaceState(
+      createProject(),
+      [],
+      [],
+      { connected: false, loading: false, fileStatus: null, reportStatus: null },
+    );
+
+    expect(state.hasSpatialConstraints).toBe(false);
+    expect(state.spatialConstraints).toEqual([]);
+    expect(state.spatialConstraintSource).toBeNull();
   });
 
   it("builds report markdown with metadata and checks", () => {
