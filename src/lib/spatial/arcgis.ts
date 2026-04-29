@@ -59,21 +59,21 @@ export const NSW_PLANNING_ARCGIS_LAYERS: ArcGisLayerConfig[] = [
     label: "NSW land zoning",
     category: SpatialConstraintCategory.ZONING,
     severity: SpatialConstraintSeverity.INFO,
-    url: "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Planning_Portal_Principal_Planning_Layers/MapServer/0/query",
+    url: "https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/2/query",
   },
   {
     id: "nsw-height-of-buildings",
     label: "NSW height of buildings",
     category: SpatialConstraintCategory.HEIGHT,
     severity: SpatialConstraintSeverity.MEDIUM,
-    url: "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Planning_Portal_Principal_Planning_Layers/MapServer/1/query",
+    url: "https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/5/query",
   },
   {
     id: "nsw-heritage",
     label: "NSW heritage overlay",
     category: SpatialConstraintCategory.HERITAGE,
     severity: SpatialConstraintSeverity.LOW,
-    url: "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Planning_Portal_Principal_Planning_Layers/MapServer/2/query",
+    url: "https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/0/query",
   },
 ];
 

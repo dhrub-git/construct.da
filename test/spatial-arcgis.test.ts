@@ -4,6 +4,7 @@ import {
   buildArcGisPointQueryUrl,
   getSpatialConstraintsForPoint,
   normalizeArcGisFeatureCollection,
+  NSW_PLANNING_ARCGIS_LAYERS,
   SpatialConstraintCategory,
   SpatialConstraintSource,
   SpatialConstraintStatus,
@@ -19,6 +20,14 @@ const layer: ArcGisLayerConfig = {
 };
 
 describe("ArcGIS spatial helpers", () => {
+
+  it("uses currently reachable NSW EPI primary planning layers by default", () => {
+    const defaults = NSW_PLANNING_ARCGIS_LAYERS.map((item) => item.url);
+
+    expect(defaults).toContain("https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/2/query");
+    expect(defaults).toContain("https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/5/query");
+    expect(defaults).toContain("https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/0/query");
+  });
   it("builds point query URLs with ArcGIS spatial parameters", () => {
     const url = new URL(buildArcGisPointQueryUrl(layer.url, { lat: -33.871, lng: 151.207 }));
 
