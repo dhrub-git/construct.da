@@ -1,0 +1,216 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+enum RuleCoverage {
+    COUNTRY
+    COUNCIL
+    STATE
+}
+
+enum IngestionStatus {
+    PENDING
+    APPROVED
+    REJECTED
+}
+
+enum FileStatus {
+    PENDING
+    PROCESSING
+    PROCESSED
+    FAILED
+}
+
+enum ProjectType {
+    NEW_DWELLING
+
+    HOME_EXTENSION
+    SECOND_STOREY_ADDITION
+    GARAGE_OR_CARPORT
+    GRANNY_FLAT
+    SWIMMING_POOL
+
+    CHANGE_OF_USE
+
+    DEMOLITION
+    SIGNAGE
+    RETAINING_WALL
+}
+
+enum ProjectReportStatus {
+    PENDING
+    COMPLETED
+    PARTIAL
+    FAILED
+}
+
+model RuleFiles {
+    id       String          @id @default(uuid())
+    name     String
+    url      String
+    coverage RuleCoverage
+    status   IngestionStatus @default(PENDING)
+    metadata Json?
+
+    createdAt      DateTime        @default(now())
+    ingestedAt     DateTime?
+    fileEmbeddings FileEmbedding[]
+
+    @@unique([name, url])
+    @@index([name, id])
+}
+
+model Files {
+    id        String     @id @default(uuid())
+    name      String
+    url       String
+    metadata  Json?
+    userId    String?
+    projectId String?
+    status    FileStatus @default(PENDING)
+
+    createdAt      DateTime        @default(now())
+    fileEmbeddings FileEmbedding[]
+    User           User?           @relation(fields: [userId], references: [id])
+    Project        Project?        @relation(fields: [projectId], references: [id])
+
+    @@index([name, id])
+    @@index([projectId])
+}
+
+model FileEmbedding {
+    id String @id @default(uuid())
+
+    fileId     String?
+    ruleFileId String?
+    projectId  String?
+    chunkIndex Int
+    pageNumber Int?
+
+    title   String?
+    content String  @db.Text
+
+    source String?
+    clause String?
+    zone   String?
+    topic  String?
+
+    embedding     Unsupported("vector")
+    search_vector Unsupported("tsvector")
+    metadata      Json?
+
+    createdAt DateTime @default(now())
+
+    Files     Files?     @relation(fields: [fileId], references: [id])
+    Project   Project?   @relation(fields: [projectId], references: [id])
+    RuleFiles RuleFiles? @relation(fields: [ruleFileId], references: [id])
+
+    @@index([fileId])
+    @@index([clause])
+    @@index([zone])
+    @@index([topic])
+    @@index([projectId])
+    @@index([search_vector], type: Gin)
+}
+
+model User {
+    id          String  @id @default(uuid())
+    email       String  @unique
+    name        String?
+    clerkUserId String  @unique
+
+    createdAt DateTime @default(now())
+
+    Projects Project[]
+    Files    Files[]
+
+    @@index([email])
+    @@index([clerkUserId])
+}
+
+model Project {
+    id          String      @id @default(uuid())
+    name        String
+    description String?
+    address     String
+    type        ProjectType
+    council     String
+    userId      String
+    metadata    Json?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    User           User            @relation(fields: [userId], references: [id])
+    Files          Files[]
+    fileEmbeddings FileEmbedding[]
+    ProjectReport  ProjectReport[]
+
+    @@index([name])
+}
+
+model ProjectReport {
+    id               String            @id @default(uuid())
+    projectId        String
+    status           ProjectReportStatus @default(PENDING)
+    score            Int?
+    summary          String?
+    executiveSummary String?
+    findingsJson     Json?
+    factsJson        Json?
+    rulesJson        Json?
+    rawOutputJson    Json?
+    content          Json
+    version          Int               @default(1)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    Project      Project                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+    findings     ProjectReportFinding[]
+    checkResults ProjectReportCheckResult[]
+
+    @@index([projectId])
+    @@index([createdAt])
+    @@unique([projectId, version])
+}
+
+model ProjectReportFinding {
+    id             String         @id @default(uuid())
+    projectReportId String
+    key            String
+    severity       String
+    title          String
+    detail         String
+    evidence       Json?
+    recommendation String?
+    createdAt      DateTime       @default(now())
+
+    projectReport ProjectReport @relation(fields: [projectReportId], references: [id], onDelete: Cascade)
+
+    @@index([projectReportId])
+    @@index([severity])
+}
+
+model ProjectReportCheckResult {
+    id              String       @id @default(uuid())
+    projectReportId String
+    key             String
+    category        String
+    passed          Boolean
+    severity        String
+    message         String
+    expected        Json?
+    actual          Json?
+    evidence        Json?
+    createdAt       DateTime     @default(now())
+
+    projectReport ProjectReport @relation(fields: [projectReportId], references: [id], onDelete: Cascade)
+
+    @@index([projectReportId])
+    @@index([category])
+}
