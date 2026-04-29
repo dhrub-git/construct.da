@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Streamdown } from "@/components/shared/Streamdown";
+import { Clause46DraftPanel } from "@/components/projects/clause46-draft-panel";
 import { ProjectWorkspaceState } from "@/lib/project-workspace";
 
 type ProjectReportTabProps = {
@@ -102,6 +103,8 @@ export function ProjectReportTab({ workspace }: ProjectReportTabProps) {
           </div>
         </CardContent>
       </Card>
+
+      <Clause46DraftPanel />
 
       <Separator />
 
