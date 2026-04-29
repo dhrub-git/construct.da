@@ -20,17 +20,17 @@ const layer: ArcGisLayerConfig = {
 };
 
 describe("ArcGIS spatial helpers", () => {
-
-  it("uses currently reachable NSW EPI primary planning layers by default", () => {
+  it("keeps NSW planning layers available for direct ArcGIS queries", () => {
     const defaults = NSW_PLANNING_ARCGIS_LAYERS.map((item) => item.url);
 
-    expect(defaults).toContain("https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/2/query");
-    expect(defaults).toContain("https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/5/query");
-    expect(defaults).toContain("https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/0/query");
+    expect(defaults).toContain("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/2");
+    expect(defaults).toContain("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Hazard/MapServer/1");
+    expect(defaults).toContain("https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/0");
   });
   it("builds point query URLs with ArcGIS spatial parameters", () => {
-    const url = new URL(buildArcGisPointQueryUrl(layer.url, { lat: -33.871, lng: 151.207 }));
+    const url = new URL(buildArcGisPointQueryUrl("https://example.test/arcgis/rest/services/planning/MapServer/0", { lat: -33.871, lng: 151.207 }));
 
+    expect(url.toString()).toContain("/MapServer/0/query?");
     expect(url.searchParams.get("f")).toBe("geojson");
     expect(url.searchParams.get("geometryType")).toBe("esriGeometryPoint");
     expect(url.searchParams.get("spatialRel")).toBe("esriSpatialRelIntersects");
@@ -41,6 +41,12 @@ describe("ArcGIS spatial helpers", () => {
       y: -33.871,
       spatialReference: { wkid: 4326 },
     });
+  });
+
+  it("keeps existing query endpoints unchanged", () => {
+    const url = new URL(buildArcGisPointQueryUrl(layer.url, { lat: -33.871, lng: 151.207 }));
+
+    expect(url.pathname).toBe("/arcgis/rest/services/planning/MapServer/0/query");
   });
 
   it("normalizes GeoJSON features into spatial constraints and geometries", () => {
@@ -85,6 +91,33 @@ describe("ArcGIS spatial helpers", () => {
     ]);
   });
 
+  it("normalizes ArcGIS JSON attributes as spatial constraints", () => {
+    const result = normalizeArcGisFeatureCollection(
+      {
+        features: [
+          {
+            attributes: {
+              OBJECTID: 9,
+              LAY_CLASS: "Flood planning area",
+            },
+            geometry: null,
+          },
+        ],
+      },
+      { ...layer, labelKey: "LAY_CLASS" },
+      "2026-04-29T00:00:00.000Z",
+      "https://example.test/query?f=json",
+    );
+
+    expect(result.constraints).toEqual([
+      expect.objectContaining({
+        id: "test-zoning-9",
+        label: "Test zoning layer",
+        value: "Flood planning area",
+      }),
+    ]);
+  });
+
   it("falls back to deterministic fixtures when ArcGIS fetch fails", async () => {
     const fetchImpl = vi.fn(async () => {
       throw new Error("network down");
@@ -101,6 +134,41 @@ describe("ArcGIS spatial helpers", () => {
     expect(result.source).toBe("fixture");
     expect(result.constraints.map((constraint) => constraint.id)).toContain("fixture-zoning");
     expect(result.constraints[0]?.source.type).toBe(SpatialConstraintSource.FIXTURE);
+  });
+
+  it("keeps successful live layers when another layer fails", async () => {
+    const fetchImpl = vi.fn(async (input: string | URL | Request) => {
+      const url = String(input);
+      if (url.includes("broken-layer")) {
+        return new Response("nope", { status: 503 });
+      }
+
+      return new Response(JSON.stringify({
+        type: "FeatureCollection",
+        features: [
+          {
+            type: "Feature",
+            properties: { OBJECTID: 4, ZONE_CODE: "R3 Medium Density" },
+            geometry: { type: "Point", coordinates: [151.207, -33.871] },
+          },
+        ],
+      }), { status: 200 });
+    }) as unknown as typeof fetch;
+
+    const result = await getSpatialConstraintsForPoint({
+      point: { lat: -33.871, lng: 151.207 },
+      address: "1 Demo Street",
+      council: "Demo Council",
+      layers: [
+        layer,
+        { ...layer, id: "broken-layer", url: "https://example.test/broken-layer/MapServer/0" },
+      ],
+      fetchImpl,
+    });
+
+    expect(result.source).toBe("arcgis");
+    expect(result.constraints).toHaveLength(1);
+    expect(result.constraints[0]).toEqual(expect.objectContaining({ value: "R3 Medium Density" }));
   });
 
   it("returns live ArcGIS results when a layer fetch succeeds", async () => {

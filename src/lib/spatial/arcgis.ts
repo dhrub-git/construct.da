@@ -7,6 +7,7 @@ import {
   type SpatialConstraint,
   type SpatialConstraintSourceMetadata,
 } from "@/lib/spatial/constraints";
+import { getLayersForPoint } from "@/lib/spatial/layers";
 
 export type SpatialPoint = {
   lat: number;
@@ -38,11 +39,15 @@ export type ArcGisLayerConfig = {
   url: string;
   category: SpatialConstraint["category"];
   severity: SpatialConstraint["severity"];
+  propertyKey?: string[];
+  labelKey?: string;
+  whereClause?: string;
 };
 
 type ArcGisFeature = {
   type?: string;
   properties?: Record<string, unknown> | null;
+  attributes?: Record<string, unknown> | null;
   geometry?: SpatialConstraintGeometry | null;
 };
 
@@ -55,25 +60,31 @@ const DEFAULT_TIMEOUT_MS = 4_000;
 
 export const NSW_PLANNING_ARCGIS_LAYERS: ArcGisLayerConfig[] = [
   {
-    id: "nsw-land-zoning",
-    label: "NSW land zoning",
+    id: "NSW_LAND_ZONING",
+    label: "NSW Land Zoning",
     category: SpatialConstraintCategory.ZONING,
     severity: SpatialConstraintSeverity.INFO,
-    url: "https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/2/query",
+    propertyKey: ["OBJECTID", "EPI_NAME", "LGA_NAME", "LAY_CLASS", "SYM_CODE", "PURPOSE", "EPI_TYPE"],
+    labelKey: "LAY_CLASS",
+    url: "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/2",
   },
   {
-    id: "nsw-height-of-buildings",
-    label: "NSW height of buildings",
-    category: SpatialConstraintCategory.HEIGHT,
+    id: "NSW_FLOOD_HAZARD",
+    label: "NSW Flood Hazard",
+    category: SpatialConstraintCategory.FLOOD,
     severity: SpatialConstraintSeverity.MEDIUM,
-    url: "https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/5/query",
+    propertyKey: ["OBJECTID", "EPI_NAME", "LGA_NAME", "LAY_CLASS", "COMMENT", "EPI_TYPE"],
+    labelKey: "LAY_CLASS",
+    url: "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/Hazard/MapServer/1",
   },
   {
-    id: "nsw-heritage",
-    label: "NSW heritage overlay",
+    id: "NSW_HERITAGE_ZONES",
+    label: "NSW Heritage Zones",
     category: SpatialConstraintCategory.HERITAGE,
     severity: SpatialConstraintSeverity.LOW,
-    url: "https://mapprod1.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/0/query",
+    propertyKey: ["OBJECTID", "EPI_NAME", "LGA_NAME", "LAY_CLASS", "H_ID", "H_NAME", "SIG", "EPI_TYPE"],
+    labelKey: "LAY_CLASS",
+    url: "https://mapprod3.environment.nsw.gov.au/arcgis/rest/services/Planning/EPI_Primary_Planning_Layers/MapServer/0",
   },
 ];
 
@@ -108,11 +119,19 @@ function stableId(value: string): string {
     .slice(0, 80);
 }
 
-export function buildArcGisPointQueryUrl(layerUrl: string, point: SpatialPoint): string {
-  const url = new URL(layerUrl);
+function arcGisQueryEndpoint(layerUrl: string): string {
+  return layerUrl.endsWith("/query") ? layerUrl : `${layerUrl.replace(/\/$/, "")}/query`;
+}
+
+export function buildArcGisPointQueryUrl(
+  layerUrl: string,
+  point: SpatialPoint,
+  layer?: Pick<ArcGisLayerConfig, "propertyKey" | "whereClause">,
+): string {
+  const url = new URL(arcGisQueryEndpoint(layerUrl));
   url.searchParams.set("f", "geojson");
-  url.searchParams.set("where", "1=1");
-  url.searchParams.set("outFields", "*");
+  url.searchParams.set("where", layer?.whereClause ?? "1=1");
+  url.searchParams.set("outFields", layer?.propertyKey?.length ? layer.propertyKey.join(",") : "*");
   url.searchParams.set("returnGeometry", "true");
   url.searchParams.set("geometryType", "esriGeometryPoint");
   url.searchParams.set("geometry", JSON.stringify({
@@ -134,13 +153,23 @@ export function normalizeArcGisFeature(
   sourceUrl: string,
   index = 0,
 ): { constraint: SpatialConstraint; geometry?: SpatialLayerGeometry } | null {
-  const properties = feature.properties ?? {};
-  const value = stringProperty(
-    properties,
-    ["label", "name", "NAME", "zone", "ZONE", "ZONE_CODE", "EPI_NAME", "HEIGHT", "MAX_B_H", "HOB", "HERITAGE_ITEM"],
-    "Mapped overlay intersects the site",
-  );
-  const title = stringProperty(properties, ["title", "TITLE", "layer", "LAYER", "LAY_CLASS"], layer.label);
+  const properties = feature.properties ?? feature.attributes ?? {};
+  const valueKeys = [
+    ...(layer.labelKey ? [layer.labelKey] : []),
+    "label",
+    "name",
+    "NAME",
+    "zone",
+    "ZONE",
+    "ZONE_CODE",
+    "EPI_NAME",
+    "HEIGHT",
+    "MAX_B_H",
+    "HOB",
+    "HERITAGE_ITEM",
+  ];
+  const value = stringProperty(properties, valueKeys, "Mapped overlay intersects the site");
+  const title = stringProperty(properties, ["title", "TITLE", "layer", "LAYER"], layer.label);
   const objectId = stringProperty(properties, ["OBJECTID", "objectid", "fid", "FID", "id"], `${index + 1}`);
   const id = `${layer.id}-${stableId(objectId) || index + 1}`;
   const source: SpatialConstraintSourceMetadata = {
@@ -194,10 +223,11 @@ export function normalizeArcGisFeatureCollection(
 async function fetchLayer(
   layer: ArcGisLayerConfig,
   point: SpatialPoint,
-  options: { signal: AbortSignal; retrievedAt: string },
+  options: { signal: AbortSignal; retrievedAt: string; fetchImpl?: typeof fetch },
 ): Promise<Pick<SpatialLayerResult, "constraints" | "geometries">> {
-  const queryUrl = buildArcGisPointQueryUrl(layer.url, point);
-  const response = await fetch(queryUrl, {
+  const queryUrl = buildArcGisPointQueryUrl(layer.url, point, layer);
+  const fetchImpl = options.fetchImpl ?? fetch;
+  const response = await fetchImpl(queryUrl, {
     headers: { accept: "application/geo+json, application/json" },
     signal: options.signal,
   });
@@ -225,19 +255,17 @@ export async function getSpatialConstraintsForPoint(input: {
   const retrievedAt = new Date().toISOString();
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), input.timeoutMs ?? DEFAULT_TIMEOUT_MS);
-  const originalFetch = globalThis.fetch;
-
-  if (input.fetchImpl) {
-    globalThis.fetch = input.fetchImpl;
-  }
+  const layers = input.layers ?? getLayersForPoint(input.point);
 
   try {
-    const layerResults = await Promise.all(
-      (input.layers ?? NSW_PLANNING_ARCGIS_LAYERS).map((layer) => fetchLayer(layer, input.point, {
+    const settledLayerResults = await Promise.allSettled(
+      layers.map((layer) => fetchLayer(layer, input.point, {
         signal: controller.signal,
         retrievedAt,
+        fetchImpl: input.fetchImpl,
       })),
     );
+    const layerResults = settledLayerResults.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
     const constraints = layerResults.flatMap((result) => result.constraints);
     const geometries = layerResults.flatMap((result) => result.geometries);
 
@@ -251,13 +279,8 @@ export async function getSpatialConstraintsForPoint(input: {
       source: "arcgis",
       loadedAt: retrievedAt,
     };
-  } catch {
-    return buildFixtureSpatialLayerResult(input, retrievedAt);
   } finally {
     clearTimeout(timeout);
-    if (input.fetchImpl) {
-      globalThis.fetch = originalFetch;
-    }
   }
 }
 
