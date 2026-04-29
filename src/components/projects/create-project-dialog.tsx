@@ -132,7 +132,7 @@ export function CreateProjectDialog({
 
     try {
       const createdProject = await dispatch(
-        createRossStreetMasterViewProjectThunk({ userId }),
+        createRossStreetMasterViewProjectThunk(),
       ).unwrap();
 
       closeDialog();

@@ -13,9 +13,23 @@ const dashboardState = vi.hoisted(() => ({
 
 const dispatchMock = vi.hoisted(() => vi.fn(() => Promise.resolve()));
 const pushMock = vi.hoisted(() => vi.fn());
+const fetchUserProjectsMock = vi.hoisted(() => vi.fn((userId: string) => ({
+  type: "dashboard/fetchUserProjects",
+  payload: userId,
+})));
+const setUserIdMock = vi.hoisted(() => vi.fn((userId: string) => ({
+  type: "dashboard/setUserId",
+  payload: userId,
+})));
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: pushMock }),
+}));
+
+vi.mock("@/redux/dashboardSlice", () => ({
+  fetchUserProjects: fetchUserProjectsMock,
+  selectDashboardState: (state: { dashboard: typeof dashboardState }) => state.dashboard,
+  setUserId: setUserIdMock,
 }));
 
 vi.mock("@/redux/useDispatch", async () => {
@@ -40,6 +54,8 @@ afterEach(() => {
   cleanup();
   dispatchMock.mockClear();
   pushMock.mockClear();
+  fetchUserProjectsMock.mockClear();
+  setUserIdMock.mockClear();
 });
 
 function createProject(overrides: Partial<ProjectStrict> = {}): ProjectStrict {

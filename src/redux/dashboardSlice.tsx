@@ -45,11 +45,11 @@ export const createProjectThunk = createAsyncThunk<
 
 export const createRossStreetMasterViewProjectThunk = createAsyncThunk<
   ProjectStrict,
-  { userId: string },
+  void,
   { state: RootState }
->("dashboard/createRossStreetMasterViewProject", async ({ userId }) => {
+>("dashboard/createRossStreetMasterViewProject", async () => {
   try {
-    return await createRossStreetMasterViewDemoProject(userId);
+    return await createRossStreetMasterViewDemoProject();
   } catch (error) {
     console.error("Error creating Ross Street MasterView project:", error);
     throw error;
