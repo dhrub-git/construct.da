@@ -109,6 +109,8 @@ export interface AddressSuggestion {
     state: string;
     postcode?: string;
     countryCode: string;
+    lat?: number;
+    lng?: number;
 }
 
 export interface DashboardResponse {

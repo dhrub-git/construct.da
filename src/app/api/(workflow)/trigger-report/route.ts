@@ -3,9 +3,37 @@ import { generateProjectReport } from "@workflows/generate-project-report";
 import { NextResponse } from "next/server";
 import { ProjectStage } from "@/types/data";
 import { updateProjectMetadata } from "@/lib/actions/projects";
+import { auth } from "@clerk/nextjs/server";
+import prisma from "@/lib/prisma";
 
 export async function POST(request: Request) {
-  const { projectId } = await request.json();
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  let projectId: string;
+  try {
+    const body = await request.json();
+    projectId = body.projectId;
+  } catch {
+    return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
+  }
+
+  if (!projectId || typeof projectId !== "string") {
+    return NextResponse.json({ message: "projectId is required" }, { status: 400 });
+  }
+
+  const project = await prisma.project.findUnique({
+    where: { id: projectId },
+    select: { userId: true },
+  });
+  if (!project) {
+    return NextResponse.json({ message: "Project not found" }, { status: 404 });
+  }
+  if (project.userId !== userId) {
+    return NextResponse.json({ message: "Forbidden" }, { status: 403 });
+  }
 
   const run = await start(generateProjectReport, [{ projectId }]);
 
