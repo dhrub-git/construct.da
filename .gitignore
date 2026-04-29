@@ -63,3 +63,7 @@ download/
 /log/
 # office temp files
 ~$*
+
+# generated artifacts
+/mockups/
+/output/

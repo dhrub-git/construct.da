@@ -18,9 +18,17 @@ type EmptyStateProps = {
   variant: EmptyStateVariant;
   action?: ReactNode;
   className?: string;
+  title?: string;
+  description?: string;
 };
 
-export function EmptyState({ variant, action, className }: EmptyStateProps) {
+export function EmptyState({
+  variant,
+  action,
+  className,
+  title,
+  description,
+}: EmptyStateProps) {
   const content = EMPTY_STATE_CONTENT[variant];
   const Icon = content.icon;
 
@@ -30,8 +38,8 @@ export function EmptyState({ variant, action, className }: EmptyStateProps) {
         <EmptyMedia variant="icon" aria-hidden>
           <Icon />
         </EmptyMedia>
-        <EmptyTitle>{content.title}</EmptyTitle>
-        <EmptyDescription>{content.message}</EmptyDescription>
+        <EmptyTitle>{title ?? content.title}</EmptyTitle>
+        <EmptyDescription>{description ?? content.message}</EmptyDescription>
       </EmptyHeader>
       {action ? <EmptyContent>{action}</EmptyContent> : null}
     </Empty>

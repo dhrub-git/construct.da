@@ -209,6 +209,43 @@ describe("project workspace helpers", () => {
     expect(state.spatialConstraintSource).toBeNull();
   });
 
+
+  it("exposes MasterView and no-clause-4.6 control-case metadata", () => {
+    const state = deriveProjectWorkspaceState(
+      createProject({
+        metadata: {
+          ...createProject().metadata,
+          masterView: {
+            applicationNumber: "10.2026.00000172.001",
+            councilReference: "DA172/2026",
+            sourceUrl: "https://masterview.northsydney.nsw.gov.au/Application/ApplicationDetails/010.2026.00000172.001/",
+            status: "In Progress",
+            determinationType: "Pending",
+            submittedDate: "2026-04-24",
+            notificationStart: "2026-05-13",
+            notificationEnd: "2026-05-27",
+            estimatedCost: "$330,000.00",
+            applicant: "Developable Pty Ltd",
+            officer: "Min-Shih Wu",
+            documents: [],
+          },
+          clause46: {
+            triggered: false,
+            reason: "SEE states height and controls are compliant.",
+            source: "MasterView SEE",
+          },
+        },
+      }),
+      [],
+      [],
+      { connected: false, loading: false, fileStatus: null, reportStatus: null },
+    );
+
+    expect(state.masterView?.applicationNumber).toBe("10.2026.00000172.001");
+    expect(state.clause46?.triggered).toBe(false);
+    expect(state.clause46?.reason).toMatch(/compliant/i);
+  });
+
   it("builds report markdown with metadata and checks", () => {
     const markdown = buildProjectReportMarkdown(createReport());
 

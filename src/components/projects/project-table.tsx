@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { ProjectStrict, ProjectStatus } from "@models/data";
-import { getProjectTypeLabel } from "@/lib/project-presentation";
+import { ProjectStrict } from "@models/data";
+import { getDashboardProjectStatus, getProjectTypeLabel } from "@/lib/project-presentation";
 import {
   Table,
   TableBody,
@@ -34,17 +34,18 @@ export function ProjectTable({ projects }: ProjectTableProps) {
       <TableBody>
         {projects.map((project) => (
           <TableRow key={project.id}>
-            <TableCell className="font-semibold text-white">{project.name}</TableCell>
+            <TableCell className="font-semibold text-foreground">{project.name}</TableCell>
             <TableCell className="max-w-72 truncate text-muted-foreground">{project.address}</TableCell>
             <TableCell className="text-muted-foreground">{project.council}</TableCell>
             <TableCell className="text-muted-foreground">{getProjectTypeLabel(project.type)}</TableCell>
             <TableCell className="text-muted-foreground">{new Date(project.createdAt).toLocaleDateString()}</TableCell>
             <TableCell>
-              <StatusBadge status={ProjectStatus.CREATED} />
+              <StatusBadge status={getDashboardProjectStatus(project)} />
             </TableCell>
             <TableCell className="text-right">
               <Link
                 href={`/dashboard/${project.id}`}
+                aria-label={`Open ${project.name}`}
                 className={cn(buttonVariants({ variant: "outline", size: "sm" }))}
               >
                 Open

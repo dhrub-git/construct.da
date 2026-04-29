@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   deterministicPdfViolationBoxes,
   getFixturePdfViolations,
+  getRossStreetControlCasePdfViolations,
   getPdfViolationsForPage,
   PDF_FIXTURE_FILE_ID,
   PDF_FIXTURE_PAGE,
@@ -31,6 +32,21 @@ describe("PDF violation fixtures", () => {
     expect(boundViolations).toHaveLength(deterministicPdfViolationBoxes.length);
     expect(boundViolations.every((violation) => violation.fileId === "uploaded-file-1")).toBe(true);
     expect(deterministicPdfViolationBoxes.every((violation) => violation.fileId === PDF_FIXTURE_FILE_ID)).toBe(true);
+  });
+
+
+
+  it("provides Ross Street control-case boxes without a cl. 4.6 breach", () => {
+    const boxes = getRossStreetControlCasePdfViolations("ross-site-plan");
+
+    expect(boxes).toHaveLength(3);
+    expect(boxes.every((box) => box.fileId === "ross-site-plan")).toBe(true);
+    expect(summarizePdfViolationSeverities(boxes)).toEqual({
+      error: 0,
+      warning: 1,
+      info: 2,
+    });
+    expect(boxes.map((box) => box.rule)).not.toContain("LEP cl. 4.6");
   });
 
   it("filters violations by one-indexed PDF page", () => {

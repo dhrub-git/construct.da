@@ -27,6 +27,30 @@ export function getProjectTypeLabel(projectType: ProjectType): string {
   return projectTypeLabels[projectType];
 }
 
+export function getDashboardProjectStatus(project: ProjectStrict): ProjectStatus {
+  return project.metadata.processingStatus ?? ProjectStatus.CREATED;
+}
+
+export type DashboardMetrics = {
+  total: number;
+  active: number;
+  needsReview: number;
+  completed: number;
+  councils: number;
+};
+
+export function buildDashboardMetrics(projects: ProjectStrict[]): DashboardMetrics {
+  const statuses = projects.map(getDashboardProjectStatus);
+
+  return {
+    total: projects.length,
+    active: statuses.filter((status) => status === ProjectStatus.CREATED || status === ProjectStatus.IN_PROGRESS).length,
+    needsReview: statuses.filter((status) => status === ProjectStatus.NEEDS_REVIEW || status === ProjectStatus.FAILED).length,
+    completed: statuses.filter((status) => status === ProjectStatus.COMPLETED).length,
+    councils: new Set(projects.map((project) => project.council).filter(Boolean)).size,
+  };
+}
+
 export function getProjectStage(files: FilesStrict[]): ProjectStage {
   if (files.length === 0) {
     return ProjectStage.CREATED;
