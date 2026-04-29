@@ -96,7 +96,7 @@ describe("getAddressSuggestions", () => {
     expect(second).toMatchObject({ id: "p2", council: "Sydney Council", state: "NSW", postcode: "2000" });
   });
 
-  it("limits geoscape calls and reuses first match as fallback", async () => {
+  it("limits geoscape calls and marks unresolved council instead of reusing distant fallback", async () => {
     const fetchCalls: string[] = [];
     const fetcher: typeof fetch = async (input) => {
       const url = String(input);
@@ -177,7 +177,7 @@ describe("getAddressSuggestions", () => {
     expect(fetchCalls.filter((url) => url.includes("findByPoint"))).toHaveLength(2);
 
     expect(suggestions).toHaveLength(3);
-    expect(suggestions[2].council).toBe("Council 1");
-    expect(suggestions[2].state).toBe("STATE_1");
+    expect(suggestions[2].council).toBe("Unknown council");
+    expect(suggestions[2].state).toBe("QLD");
   });
 });

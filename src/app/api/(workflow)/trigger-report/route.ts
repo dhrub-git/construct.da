@@ -4,7 +4,7 @@ import { NextResponse } from "next/server";
 import { ProjectStage } from "@/types/data";
 import { updateProjectMetadata } from "@/lib/actions/projects";
 import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/prisma";
+import { resolveProjectOwnership } from "@/lib/api/workflow-auth";
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -24,14 +24,11 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "projectId is required" }, { status: 400 });
   }
 
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    select: { userId: true },
-  });
-  if (!project) {
+  const ownership = await resolveProjectOwnership(projectId, userId);
+  if (ownership.status === "missing") {
     return NextResponse.json({ message: "Project not found" }, { status: 404 });
   }
-  if (project.userId !== userId) {
+  if (ownership.status === "forbidden") {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
 

@@ -27,7 +27,7 @@ import {
   mergeMetadata,
 } from "./ingestion-shared";
 
-interface ProjectFilesConfig {
+export interface ProjectFilesConfig {
   batchSize?: number;
   concurrency?: number;
   fileIds?: string[];
@@ -45,6 +45,12 @@ interface ProjectFilesSummary {
   skipped: number;
 }
 
+interface ProcessingProgressState {
+  completedFiles: string[];
+  failedFiles: string[];
+  processingFiles: string[];
+}
+
 interface FileProcessResult {
   fileId: string;
   status: "succeeded" | "failed" | "skipped";
@@ -53,39 +59,65 @@ interface FileProcessResult {
 
 export async function processProjectFiles(
   projectId: string,
-  config?: ProjectFilesConfig,
+  config?: unknown,
 ) {
   "use workflow";
 
   const effectiveConfig = resolveProjectConfig(config);
   console.log("Effective configuration for processing project files:", effectiveConfig);
 
-  const { files, length } = await fetchProjectFiles(projectId, effectiveConfig);
-  if (length === 0) {
-    return {
-      total: 0,
-      processed: 0,
-      succeeded: 0,
-      failed: 0,
-      skipped: 0,
-    } satisfies ProjectFilesSummary;
-  }
+  const progress: ProcessingProgressState = {
+    completedFiles: [],
+    failedFiles: [],
+    processingFiles: [],
+  };
 
-  const results = await processItemsConcurrently(
-    files,
-    effectiveConfig.concurrency,
-    async (file) => processSingleFile(file, effectiveConfig),
-  );
+  try {
+    const { files, length } = await fetchProjectFiles(projectId, effectiveConfig);
+    if (length === 0) {
+      await emitProgress(length, progress, false, true, null);
+      return {
+        total: 0,
+        processed: 0,
+        succeeded: 0,
+        failed: 0,
+        skipped: 0,
+      } satisfies ProjectFilesSummary;
+    }
 
-  const summary = summarizeIngestionResults(results, length);
-  if (summary.succeeded > 0) {
-    await triggerReportGeneration(projectId, summary);
+    progress.processingFiles = files.map((file) => file.id);
+    await emitProgress(length, progress, false, false, null);
+
+    const results = await processItemsConcurrently(
+      files,
+      effectiveConfig.concurrency,
+      async (file) => {
+        const result = await processSingleFile(file, effectiveConfig);
+        progress.processingFiles = progress.processingFiles.filter((id) => id !== file.id);
+        if (result.status === "failed") {
+          progress.failedFiles.push(file.id);
+        } else {
+          progress.completedFiles.push(file.id);
+        }
+        await emitProgress(length, progress, false, false, null);
+        return result;
+      },
+    );
+
+    const summary = summarizeIngestionResults(results, length);
+    if (summary.succeeded > 0) {
+      await triggerReportGeneration(projectId, summary, progress);
+    } else {
+      await emitProgress(length, progress, false, true, null);
+    }
+
+    return summary;
+  } finally {
+    await finalizeStream();
   }
-  await finalizeStream();
-  return summary;
 }
 
-function resolveProjectConfig(config?: ProjectFilesConfig): Required<ProjectFilesConfig> {
+function resolveProjectConfig(config?: unknown): Required<ProjectFilesConfig> {
   return resolveIngestionConfig(config);
 }
 
@@ -100,14 +132,48 @@ async function fetchProjectFiles(
       ? ["PENDING", "FAILED"]
       : ["PENDING"];
 
-    const files = await prisma.files.findMany({
-      where: {
-        projectId,
-        status: { in: statuses },
-        ...(config.fileIds.length > 0 ? { id: { in: config.fileIds } } : {}),
-      },
-      orderBy: [{ createdAt: "asc" }],
-      take: config.batchSize,
+    const files = await prisma.$transaction(async (tx) => {
+      const candidates = await tx.files.findMany({
+        where: {
+          projectId,
+          status: { in: statuses },
+          ...(config.fileIds.length > 0 ? { id: { in: config.fileIds } } : {}),
+        },
+        orderBy: [{ createdAt: "asc" }],
+        select: { id: true },
+        take: config.batchSize,
+      });
+
+      const claimedIds: string[] = [];
+      for (const candidate of candidates) {
+        const claim = await tx.files.updateMany({
+          where: {
+            id: candidate.id,
+            projectId,
+            status: { in: statuses },
+          },
+          data: {
+            status: "PROCESSING",
+          },
+        });
+
+        if (claim.count === 1) {
+          claimedIds.push(candidate.id);
+        }
+      }
+
+      if (claimedIds.length === 0) {
+        return [];
+      }
+
+      return tx.files.findMany({
+        where: {
+          id: { in: claimedIds },
+          projectId,
+          status: "PROCESSING",
+        },
+        orderBy: [{ createdAt: "asc" }],
+      });
     });
 
     return {
@@ -343,7 +409,11 @@ async function persistEmbeddings(
   }
 }
 
-async function triggerReportGeneration(projectId: string, summary: ProjectFilesSummary) {
+async function triggerReportGeneration(
+  projectId: string,
+  summary: ProjectFilesSummary,
+  progress: ProcessingProgressState,
+) {
   "use step";
   try {
     const run = await start(generateProjectReport, [{ projectId }]);
@@ -354,16 +424,7 @@ async function triggerReportGeneration(projectId: string, summary: ProjectFilesS
     });
 
     console.log("Report generation run started", run.runId);
-    await writeToStream({
-      completed: summary.succeeded,
-      total: summary.total,
-      failed: summary.failed,
-      completedFiles: [],
-      failedFiles: [],
-      processingFiles: [],
-      processingComplete: true,
-      nextRunId: run.runId,
-    });
+    await emitProgress(summary.total, progress, true, true, run.runId);
 
     return {
       success: true,
@@ -377,6 +438,29 @@ async function triggerReportGeneration(projectId: string, summary: ProjectFilesS
       }`,
     );
   }
+}
+
+async function emitProgress(
+  total: number,
+  progress: ProcessingProgressState,
+  includeFailedInCompleted: boolean,
+  processingComplete: boolean,
+  nextRunId: string | null,
+) {
+  const completed = includeFailedInCompleted
+    ? progress.completedFiles.length + progress.failedFiles.length
+    : progress.completedFiles.length;
+
+  await writeToStream({
+    completed,
+    total,
+    failed: progress.failedFiles.length,
+    completedFiles: [...progress.completedFiles],
+    failedFiles: [...progress.failedFiles],
+    processingFiles: [...progress.processingFiles],
+    processingComplete,
+    nextRunId,
+  });
 }
 
 async function writeToStream(data: ProcessingProjectFileStatus) {

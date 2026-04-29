@@ -20,7 +20,7 @@ import {
   resolveIngestionConfig,
 } from "./ingestion-shared";
 
-interface IngestRuleFilesConfig {
+export interface IngestRuleFilesConfig {
   batchSize?: number;
   concurrency?: number;
   fileIds?: string[];
@@ -44,11 +44,11 @@ interface FileProcessResult {
   reason?: string;
 }
 
-function resolveRuleConfig(config?: IngestRuleFilesConfig): Required<IngestRuleFilesConfig> {
+function resolveRuleConfig(config?: unknown): Required<IngestRuleFilesConfig> {
   return resolveIngestionConfig(config);
 }
 
-export async function handleIngestRuleFiles(config?: IngestRuleFilesConfig) {
+export async function handleIngestRuleFiles(config?: unknown) {
   "use workflow";
 
   const effectiveConfig = resolveRuleConfig(config);
@@ -214,7 +214,7 @@ async function persistEmbeddings(
 ) {
   "use step";
 
-  await prisma.fileEmbedding.deleteMany({ where: { fileId } });
+  await prisma.fileEmbedding.deleteMany({ where: { ruleFileId: fileId } });
 
   for (let offset = 0; offset < chunks.length; offset += embeddingBatchSize) {
     const batch = chunks.slice(offset, offset + embeddingBatchSize);

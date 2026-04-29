@@ -2,21 +2,37 @@ import { start } from "workflow/api";
 import { handleIngestRuleFiles } from "@workflows/ingesting-rule-files";
 import { NextResponse } from "next/server";
 import { auth } from "@clerk/nextjs/server";
+import {
+  hasAdminRole,
+  hasValidIngestionServiceToken,
+} from "@/lib/api/workflow-auth";
+import {
+  IngestionConfigValidationError,
+  parseIngestionRuntimeConfig,
+} from "@/lib/workflows/ingestion-shared";
 
 export async function POST(request: Request) {
-  const { isAuthenticated } = await auth();
-  if (!isAuthenticated) {
+  const authResult = await auth();
+  const hasServiceToken = hasValidIngestionServiceToken(request);
+  if (!authResult.isAuthenticated && !hasServiceToken) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  let config;
-  try {
-    ({ config } = await request.json());
-  } catch {
-    return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
+  if (!hasServiceToken && !hasAdminRole(authResult.sessionClaims)) {
+    return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
 
-  // Executes asynchronously and doesn't block your app
+  let config: ReturnType<typeof parseIngestionRuntimeConfig>;
+  try {
+    const body = await request.json();
+    config = parseIngestionRuntimeConfig(body.config);
+  } catch (error) {
+    const message = error instanceof IngestionConfigValidationError
+      ? error.message
+      : "Invalid request body";
+    return NextResponse.json({ message }, { status: 400 });
+  }
+
   const run = await start(handleIngestRuleFiles, [config]);
 
   console.log("Started run", run.runId);

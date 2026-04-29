@@ -238,7 +238,7 @@ function pickCouncilForPlace(
   }
 
   if (geoscapeCalls.count >= MAX_GEOSCAPE_CALLS) {
-    return Promise.resolve(groups.length > 0 ? groups[0] : null);
+    return Promise.resolve(null);
   }
 
   return fetchGeoscapeCouncil(lat, lng, geoscapeApiKey, fetcher).then((match) => {
@@ -246,11 +246,7 @@ function pickCouncilForPlace(
       groups.push(match);
     }
     geoscapeCalls.count += 1;
-    if (match) {
-      return match;
-    }
-
-    return groups.length > 0 ? groups[0] : null;
+    return match;
   });
 }
 

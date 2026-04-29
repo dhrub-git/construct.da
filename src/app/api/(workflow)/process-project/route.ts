@@ -4,7 +4,11 @@ import { NextResponse } from "next/server";
 import { updateProjectMetadata } from "@/lib/actions/projects";
 import { ProjectStage, ProjectStatus } from "@models/data";
 import { auth } from "@clerk/nextjs/server";
-import prisma from "@/lib/prisma";
+import { resolveProjectOwnership } from "@/lib/api/workflow-auth";
+import {
+  IngestionConfigValidationError,
+  parseIngestionRuntimeConfig,
+} from "@/lib/workflows/ingestion-shared";
 
 export async function POST(request: Request) {
   const { userId } = await auth();
@@ -13,31 +17,41 @@ export async function POST(request: Request) {
   }
 
   let projectId: string;
-  let config: Parameters<typeof processProjectFiles>[1];
+  let config: ReturnType<typeof parseIngestionRuntimeConfig>;
   try {
     const body = await request.json();
     projectId = body.projectId;
-    config = body.config;
-  } catch {
-    return NextResponse.json({ message: "Invalid request body" }, { status: 400 });
+    config = parseIngestionRuntimeConfig(body.config);
+  } catch (error) {
+    const message = error instanceof IngestionConfigValidationError
+      ? error.message
+      : "Invalid request body";
+    return NextResponse.json({ message }, { status: 400 });
   }
 
   if (!projectId || typeof projectId !== "string") {
     return NextResponse.json({ message: "projectId is required" }, { status: 400 });
   }
 
-  const project = await prisma.project.findUnique({
-    where: { id: projectId },
-    select: { userId: true },
-  });
-  if (!project) {
+  const ownership = await resolveProjectOwnership(projectId, userId);
+  if (ownership.status === "missing") {
     return NextResponse.json({ message: "Project not found" }, { status: 404 });
   }
-  if (project.userId !== userId) {
+  if (ownership.status === "forbidden") {
     return NextResponse.json({ message: "Forbidden" }, { status: 403 });
   }
 
-  // Executes asynchronously and doesn't block your app
+  const metadata = ownership.project.metadata as { runId?: unknown; processingStatus?: unknown } | null;
+  if (metadata?.processingStatus === ProjectStatus.IN_PROGRESS) {
+    return NextResponse.json(
+      {
+        runId: typeof metadata.runId === "string" ? metadata.runId : null,
+        message: "Project processing is already in progress",
+      },
+      { status: 409 },
+    );
+  }
+
   const run = await start(processProjectFiles, [projectId, config]);
 
   console.log("Started run", run.runId);

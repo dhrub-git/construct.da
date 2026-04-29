@@ -33,6 +33,15 @@ export interface IngestionRuntimeConfig {
   requestDelayMs: number;
 }
 
+export type IngestionRuntimeConfigInput = Partial<IngestionRuntimeConfig>;
+
+export class IngestionConfigValidationError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "IngestionConfigValidationError";
+  }
+}
+
 export async function processItemsConcurrently<T, R>(
   items: T[],
   concurrency: number,
@@ -53,22 +62,95 @@ export async function processItemsConcurrently<T, R>(
   return results;
 }
 
-export function resolveIngestionConfig<T extends Partial<IngestionRuntimeConfig>>(config?: T): Required<IngestionRuntimeConfig> {
-  const batchSize = clamp(config?.batchSize ?? DEFAULT_BATCH_SIZE, 1, 100);
-  const concurrency = clamp(config?.concurrency ?? DEFAULT_CONCURRENCY, 1, MAX_SAFE_CONCURRENCY);
-  const maxRetries = clamp(config?.maxRetries ?? DEFAULT_MAX_RETRIES, 1, 10);
-  const embeddingBatchSize = clamp(config?.embeddingBatchSize ?? DEFAULT_EMBEDDING_BATCH_SIZE, 1, 200);
-  const requestDelayMs = clamp(config?.requestDelayMs ?? DEFAULT_INGESTION_CONFIG.requestDelayMs, 0, MAX_REQUEST_DELAY_MS);
+export function parseIngestionRuntimeConfig(
+  value: unknown,
+): IngestionRuntimeConfigInput | undefined {
+  if (value === undefined || value === null) {
+    return undefined;
+  }
+
+  if (!isPlainObject(value)) {
+    throw new IngestionConfigValidationError("config must be an object");
+  }
+
+  return {
+    batchSize: readOptionalFiniteNumber(value, "batchSize"),
+    concurrency: readOptionalFiniteNumber(value, "concurrency"),
+    fileIds: readOptionalStringArray(value, "fileIds"),
+    retryFailed: readOptionalBoolean(value, "retryFailed"),
+    maxRetries: readOptionalFiniteNumber(value, "maxRetries"),
+    embeddingBatchSize: readOptionalFiniteNumber(value, "embeddingBatchSize"),
+    requestDelayMs: readOptionalFiniteNumber(value, "requestDelayMs"),
+  };
+}
+
+export function resolveIngestionConfig(
+  config?: unknown,
+): Required<IngestionRuntimeConfig> {
+  const parsed = parseIngestionRuntimeConfig(config);
+  const batchSize = clamp(parsed?.batchSize ?? DEFAULT_BATCH_SIZE, 1, 100);
+  const concurrency = clamp(parsed?.concurrency ?? DEFAULT_CONCURRENCY, 1, MAX_SAFE_CONCURRENCY);
+  const maxRetries = clamp(parsed?.maxRetries ?? DEFAULT_MAX_RETRIES, 1, 10);
+  const embeddingBatchSize = clamp(parsed?.embeddingBatchSize ?? DEFAULT_EMBEDDING_BATCH_SIZE, 1, 200);
+  const requestDelayMs = clamp(parsed?.requestDelayMs ?? DEFAULT_INGESTION_CONFIG.requestDelayMs, 0, MAX_REQUEST_DELAY_MS);
 
   return {
     batchSize,
     concurrency,
-    fileIds: config?.fileIds ?? [],
-    retryFailed: config?.retryFailed ?? false,
+    fileIds: parsed?.fileIds ?? [],
+    retryFailed: parsed?.retryFailed ?? false,
     maxRetries,
     embeddingBatchSize,
     requestDelayMs,
   };
+}
+
+function readOptionalFiniteNumber(
+  value: Record<string, unknown>,
+  key: keyof IngestionRuntimeConfig,
+): number | undefined {
+  const candidate = value[key];
+  if (candidate === undefined) {
+    return undefined;
+  }
+
+  if (typeof candidate !== "number" || !Number.isFinite(candidate)) {
+    throw new IngestionConfigValidationError(`${key} must be a finite number`);
+  }
+
+  return candidate;
+}
+
+function readOptionalBoolean(
+  value: Record<string, unknown>,
+  key: keyof IngestionRuntimeConfig,
+): boolean | undefined {
+  const candidate = value[key];
+  if (candidate === undefined) {
+    return undefined;
+  }
+
+  if (typeof candidate !== "boolean") {
+    throw new IngestionConfigValidationError(`${key} must be a boolean`);
+  }
+
+  return candidate;
+}
+
+function readOptionalStringArray(
+  value: Record<string, unknown>,
+  key: keyof IngestionRuntimeConfig,
+): string[] | undefined {
+  const candidate = value[key];
+  if (candidate === undefined) {
+    return undefined;
+  }
+
+  if (!Array.isArray(candidate) || candidate.some((item) => typeof item !== "string" || item.length === 0)) {
+    throw new IngestionConfigValidationError(`${key} must be an array of non-empty strings`);
+  }
+
+  return candidate;
 }
 
 export function clamp(value: number, min: number, max: number): number {
@@ -164,8 +246,7 @@ export function mergeMetadata(
     return current as Prisma.InputJsonObject;
   }
 
-  const merged = deepMerge(current, patch);
-  return merged as Prisma.InputJsonObject;
+  return deepMerge(current, patch) as Prisma.InputJsonObject;
 }
 
 function deepMerge(
@@ -175,14 +256,8 @@ function deepMerge(
   const output: Record<string, unknown> = { ...target };
 
   for (const [key, value] of Object.entries(source)) {
-    if (
-      isPlainObject(value) &&
-      isPlainObject(output[key])
-    ) {
-      output[key] = deepMerge(
-        output[key] as Record<string, unknown>,
-        value as Record<string, unknown>,
-      );
+    if (isPlainObject(value) && isPlainObject(output[key])) {
+      output[key] = deepMerge(output[key] as Record<string, unknown>, value);
       continue;
     }
 
@@ -196,10 +271,12 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
   return !!value && typeof value === "object" && !Array.isArray(value);
 }
 
-export function buildIngestionConfig(config: Pick<IngestionRuntimeConfig, "maxRetries" | "embeddingBatchSize">): IngestionConfig {
+export function buildIngestionConfig(
+  config: Pick<IngestionRuntimeConfig, "embeddingBatchSize" | "requestDelayMs">,
+): IngestionConfig {
   return {
     ...DEFAULT_INGESTION_CONFIG,
-    maxRetries: config.maxRetries,
     embeddingBatchSize: config.embeddingBatchSize,
+    requestDelayMs: config.requestDelayMs,
   };
 }
