@@ -21,10 +21,12 @@ import {
   SpatialConstraintStatus,
   type SpatialConstraint,
 } from "@/lib/spatial";
+import { ProjectConstraintMap } from "@/components/projects/project-constraint-map";
 import { ProjectStatsCards } from "@/components/projects/project-stats-cards";
 import { ProjectWorkflowTimeline } from "@/components/projects/project-workflow-timeline";
 
 type ProjectOverviewTabProps = {
+  projectId: string;
   workspace: ProjectWorkspaceState;
 };
 
@@ -105,7 +107,7 @@ function ConstraintSummaryCard({ constraint, icon: Icon }: { constraint: Spatial
   );
 }
 
-function SpatialConstraintPanel({ workspace }: ProjectOverviewTabProps) {
+function SpatialConstraintPanel({ projectId, workspace }: ProjectOverviewTabProps) {
   const zoning = workspace.spatialConstraints.find((constraint) => constraint.category === SpatialConstraintCategory.ZONING);
   const heightLimit = workspace.spatialConstraints.find((constraint) => constraint.category === SpatialConstraintCategory.HEIGHT);
   const riskCategories = new Set<SpatialConstraintCategory>([
@@ -131,6 +133,14 @@ function SpatialConstraintPanel({ workspace }: ProjectOverviewTabProps) {
         ) : null}
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
+        <ProjectConstraintMap
+          projectId={projectId}
+          address={workspace.address}
+          location={workspace.location}
+          initialConstraints={workspace.spatialConstraints}
+          initialSource={workspace.spatialConstraintSource}
+        />
+
         <div className="grid gap-4 md:grid-cols-2">
           <ConstraintSummaryCard constraint={zoning} icon={MapPinnedIcon} />
           <ConstraintSummaryCard constraint={heightLimit} icon={RulerIcon} />
@@ -169,12 +179,12 @@ function SpatialConstraintPanel({ workspace }: ProjectOverviewTabProps) {
   );
 }
 
-export function ProjectOverviewTab({ workspace }: ProjectOverviewTabProps) {
+export function ProjectOverviewTab({ projectId, workspace }: ProjectOverviewTabProps) {
   return (
     <div className="flex flex-col gap-6">
       <ProjectStatsCards workspace={workspace} />
       <ProjectWorkflowTimeline workspace={workspace} />
-      <SpatialConstraintPanel workspace={workspace} />
+      <SpatialConstraintPanel projectId={projectId} workspace={workspace} />
 
       <Card>
         <CardHeader>

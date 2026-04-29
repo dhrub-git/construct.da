@@ -217,7 +217,7 @@ function WorkspaceContent({ projectId, userId }: ProjectDetailsPageClientProps) 
         </TabsList>
 
         <TabsContent value="overview">
-          <ProjectOverviewTab workspace={workspaceWithLiveState} />
+          <ProjectOverviewTab projectId={projectId} workspace={workspaceWithLiveState} />
         </TabsContent>
 
         <TabsContent value="report">

@@ -1,7 +1,7 @@
 import prisma from "@/lib/prisma";
 
 export type ProjectOwnershipResult =
-  | { status: "owned"; project: { id: string; userId: string; metadata: unknown } }
+  | { status: "owned"; project: { id: string; userId: string; address: string; council: string; metadata: unknown } }
   | { status: "missing" }
   | { status: "forbidden" };
 
@@ -14,6 +14,8 @@ export async function resolveProjectOwnership(
     select: {
       id: true,
       userId: true,
+      address: true,
+      council: true,
       metadata: true,
       User: {
         select: {
@@ -36,6 +38,8 @@ export async function resolveProjectOwnership(
     project: {
       id: project.id,
       userId: project.userId,
+      address: project.address,
+      council: project.council,
       metadata: project.metadata,
     },
   };

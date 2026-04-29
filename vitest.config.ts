@@ -22,5 +22,6 @@ export default defineConfig({
     environment: "jsdom",
     setupFiles: ["./test/setup.ts"],
     css: true,
+    exclude: ["**/node_modules/**", "**/.next/**", "**/.omx/**"],
   },
 });

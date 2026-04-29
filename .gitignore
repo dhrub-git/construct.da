@@ -39,6 +39,7 @@ pnpm-lock.yaml
 
 # env files
 .env*
+!.env.example
 
 # vercel
 .vercel

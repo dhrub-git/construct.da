@@ -75,6 +75,9 @@ export type ProjectWorkspaceState = {
   hasSpatialConstraints: boolean;
   spatialConstraintSource: SpatialConstraintSource | null;
   spatialConstraintsLoadedAt: string | null;
+  address: string;
+  council: string;
+  location: { lat: number; lng: number } | null;
 };
 
 function asDate(value: string | Date | null | undefined): Date | null {
@@ -272,6 +275,10 @@ export function deriveProjectWorkspaceState(
   const reportMarkdown = latestReport ? buildProjectReportMarkdown(latestReport) : null;
   const spatialMetadata = normalizeSpatialConstraintMetadata(project.metadata);
   const spatialConstraints = spatialMetadata.spatialConstraints;
+  const geoEncoding = project.metadata.geoEncoding;
+  const location = typeof geoEncoding?.lat === "number" && typeof geoEncoding?.lng === "number"
+    ? { lat: geoEncoding.lat, lng: geoEncoding.lng }
+    : null;
   const reportMetadata = latestReport
     ? {
         generatedAt: formatIsoDate(latestReport.createdAt),
@@ -359,6 +366,9 @@ export function deriveProjectWorkspaceState(
     hasSpatialConstraints: spatialConstraints.length > 0,
     spatialConstraintSource: spatialMetadata.spatialConstraintsSource ?? null,
     spatialConstraintsLoadedAt: spatialMetadata.spatialConstraintsLoadedAt ?? null,
+    address: project.address,
+    council: project.council,
+    location,
   };
 }
 
